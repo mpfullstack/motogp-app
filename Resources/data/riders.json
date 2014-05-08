@@ -1,0 +1,91 @@
+[{
+    "id": 1,
+    "name": "Marc Marquez",
+    "team": "Repsol Honda",
+    "number": 93,
+    "town": "Cervera"
+},
+{
+    "id": 2,
+    "name": "Dani Pedrosa",
+    "team": "Repsol Honda",
+    "number": 26,
+    "town": "Sabadell" 
+},
+{
+    "id": 3,
+    "name": "Jorge Lorenzo",
+    "team": "Movistar Yamaha",
+    "number": 99,
+    "town": "Palma de Mallorca"
+},
+{
+    "id": 4,
+    "name": "Valentino Rossi",
+    "team": "Movistar Yamaha",
+    "number": 46,
+    "town": "Urbino"
+},
+{
+    "id": 5,
+    "name": "Cal Crutchlow",
+    "team": "Ducati",
+    "number": 35,
+    "town": "Coventry"
+},
+{
+    "id": 6,
+    "name": "Scott Redding",
+    "team": "GO&FUN Honda Gresini",
+    "number": 45,
+    "town": "Quedgeley"
+},
+{
+    "id": 7,
+    "name": "Aleix Espargaro",
+    "team": "NGM Forward Racing",
+    "number": 41,
+    "town": "Granollers"
+},
+{
+    "id": 8,
+    "name": "Stefan Bradl",
+    "team": "LCR Honda",
+    "number": 6,
+    "town": "Augsburg"
+},
+{
+    "id": 9,
+    "name": "Andrea Dovizioso",
+    "team": "Ducati",
+    "number": 4,
+    "town": "Forlimpopoli"
+},
+{
+    "id": 10,
+    "name": "Colin Edwards",
+    "team": "NGM Forward Racing",
+    "number": 5,
+    "town": "Houston"
+},
+{
+    "id": 11,
+    "name": "Andrea Iannone",
+    "team": "Pramac Racing",
+    "number": 29,
+    "town": "Vasto"
+},
+{
+    "id": 12,
+    "name": "Yonny Hernandez",
+    "team": "Energy T.I. Pramac Racing",
+    "number": 68,
+    "town": "Medellín"
+},
+{
+    "id": 13,
+    "name": "Nicky Hayden",
+    "team": "Drive M7 Aspar",
+    "number": 69,
+    "town": "Owensboro"
+}]
