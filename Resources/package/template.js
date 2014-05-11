@@ -25,50 +25,58 @@ ws.Template = (function(){
         templates: {
             "main": {
                 properties: {
-                    height: 80
+                    height: 80,
+                    selectedBackgroundColor: '#eee'
                 },
                 events: {
                     // Bind event callbacks for bubbled events
                     // Events caught here are fired by the subcomponent views of the ListItem
                     click: function(e) {
                         Ti.API.info("click item id: " +e.itemId);
+                        ws.controller.action('riderDetail', e.itemId);
                     }
                 },
                 childTemplates: [{
-                    // type: 'Ti.UI.ImageView',
-                    // bindId: 'icon',
-                    // properties: {
-                        // image: '/images/icon.png',
-                        // top: 0,
-                        // left: 0,
-                        // width: 50,
-                        // height: 50,
-                        // bubbleParent: false
-                    // }
-                    // ,
-                    // events: {
-                        // click: function (e) {
-                            // alert('You clicked icon.');
-                            // Ti.API.debug(e);
-                        // }
-                    // }
-                }, {
+                    type: 'Ti.UI.ImageView',
+                    bindId: 'icon',
+                    properties: {
+                        image: '',
+                        top: 5,
+                        left: 0,
+                        width: 60,
+                        zIndex: 1
+                    }
+                }, 
+                {
                    type: 'Ti.UI.Label',
                     bindId: 'number',
                     properties: {
                         font: {
                             fontWeight: 'bold',
-                            fontSize: 34,
+                            fontSize: 40,
                             fontFamily: ws.fonts.fontStyles.menu.fontFamily
                         },
                         color: '#333333',
-                        top: 7,
+                        top: 0,
                         left: 0,
-                        width: 47,
-                        height: Ti.UI.SIZE,
-                        bubbleParent: false
+                        width: 60,
+                        zIndex: 0,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+                        height: Ti.UI.SIZE
                     } 
-                }, {
+                },
+                {
+                    type: 'Ti.UI.ImageView',
+                    bindId: 'flag',
+                    properties: {
+                        image: '',
+                        bottom: 12,
+                        left: 36,
+                        width: 24,
+                        zIndex: 3
+                    }
+                },
+                {
                     type: 'Ti.UI.Label',
                     bindId: 'name',
                     properties: {
@@ -78,18 +86,10 @@ ws.Template = (function(){
                         },
                         color: ws.fonts.fontStyles.riderName.fontColor,
                         top: 4,
-                        left: 50,
+                        left: 73,
                         width: Ti.UI.SIZE,
-                        height: Ti.UI.SIZE,
-                        bubbleParent: false
+                        height: Ti.UI.SIZE
                     }
-                    // ,
-                    // events: {
-                        // click: function (e) {
-                            // alert('You clicked name.');
-                            // Ti.API.debug(e);
-                        // }
-                    // }
                 }, {
                     type: 'Ti.UI.Label',
                     bindId: 'team',
@@ -99,19 +99,11 @@ ws.Template = (function(){
                             fontFamily: ws.fonts.fontStyles.team.fontFamily
                         },
                         color: ws.fonts.fontStyles.team.fontColor,
-                        top: 28,
-                        left: 50,
+                        top: 31,
+                        left: 73,
                         width: Ti.UI.SIZE,
-                        height: Ti.UI.SIZE,
-                        bubbleParent: false
+                        height: Ti.UI.SIZE
                     }
-                    // ,
-                    // events: {
-                        // click: function (e) {
-                            // alert('You clicked epoch.');
-                            // Ti.API.debug(e);
-                        // }
-                    // }
                 }, {
                     type: 'Ti.UI.Label',
                     bindId: 'town',
@@ -121,19 +113,11 @@ ws.Template = (function(){
                             fontFamily: ws.fonts.fontStyles.team.fontFamily
                         },
                         color: ws.fonts.fontStyles.town.fontColor,
-                        top: 48,
-                        left: 50,
+                        top: 55,
+                        left: 73,
                         width: Ti.UI.SIZE,
-                        height: Ti.UI.SIZE,
-                        bubbleParent: false
+                        height: Ti.UI.SIZE
                     }
-                    // ,
-                    // events: {
-                        // click: function (e) {
-                            // alert('You clicked epoch.');
-                            // Ti.API.debug(e);
-                        // }
-                    // }
                 }, {
                     type: 'Ti.UI.ImageView',
                     bindId: 'arrow',
@@ -142,16 +126,8 @@ ws.Template = (function(){
                         top: 28,
                         right: 5,
                         width: 24,
-                        height: 24,
-                        bubbleParent: false
+                        height: 24
                     }
-                    // ,
-                    // events: {
-                        // click: function (e) {
-                            // alert('You clicked icon.');
-                            // Ti.API.debug(e);
-                        // }
-                    // }
                 }]
             }    
         },

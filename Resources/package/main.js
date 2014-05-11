@@ -1,6 +1,7 @@
 // Include App files
 // -----------------------------------------
 Ti.include('fonts.js');
+Ti.include('model.js');
 Ti.include('template.js');
 Ti.include('controller.js');
 // -----------------------------------------
@@ -73,7 +74,7 @@ ws.topBar = new ws.menu.TopBar({
 });
 ws.mainWindow.add(ws.topBar.view);
 
-// TopBar
+// MainMenu
 // ----------------------------------------------------
 ws.mainMenu = new ws.menu.Main({
     draggable: true,
@@ -94,11 +95,9 @@ var onClickMainMenuOption = function(obj) {
     ws.mainMenu.opacityView.animate({
         opacity: 0,
         duration: 150,
-    },function(e) {
-        ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});        
+    },function(e) {                
         Ti.API.info("CLICK ON " + obj.source.id);
         ws.controller.action(obj.source.id);
-        ws.animation.hideActivityIndicator();
         ws.mainMenu.setVisible(false);
         ws.mainMenu.opacityView.setVisible(false);
     });
