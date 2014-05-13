@@ -26,7 +26,7 @@ ws.Template = (function(){
             "main": {
                 properties: {
                     height: 80,
-                    selectedBackgroundColor: '#eee'
+                    selectedBackgroundColor: '#bbb'
                 },
                 events: {
                     // Bind event callbacks for bubbled events
@@ -38,11 +38,11 @@ ws.Template = (function(){
                 },
                 childTemplates: [{
                     type: 'Ti.UI.ImageView',
-                    bindId: 'icon',
+                    bindId: 'iconNumber',
                     properties: {
                         image: '',
                         top: 5,
-                        left: 0,
+                        left: 6,
                         width: 60,
                         zIndex: 1
                     }
@@ -58,7 +58,7 @@ ws.Template = (function(){
                         },
                         color: '#333333',
                         top: 0,
-                        left: 0,
+                        left: 6,
                         width: 60,
                         zIndex: 0,
                         textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
@@ -71,7 +71,7 @@ ws.Template = (function(){
                     properties: {
                         image: '',
                         bottom: 12,
-                        left: 36,
+                        left: 42,
                         width: 24,
                         zIndex: 3
                     }
@@ -86,7 +86,7 @@ ws.Template = (function(){
                         },
                         color: ws.fonts.fontStyles.riderName.fontColor,
                         top: 4,
-                        left: 73,
+                        left: 79,
                         width: Ti.UI.SIZE,
                         height: Ti.UI.SIZE
                     }
@@ -100,7 +100,7 @@ ws.Template = (function(){
                         },
                         color: ws.fonts.fontStyles.team.fontColor,
                         top: 31,
-                        left: 73,
+                        left: 79,
                         width: Ti.UI.SIZE,
                         height: Ti.UI.SIZE
                     }
@@ -114,7 +114,7 @@ ws.Template = (function(){
                         },
                         color: ws.fonts.fontStyles.town.fontColor,
                         top: 55,
-                        left: 73,
+                        left: 79,
                         width: Ti.UI.SIZE,
                         height: Ti.UI.SIZE
                     }

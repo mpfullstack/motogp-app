@@ -35,13 +35,26 @@ ws.Controller = (function(){
         // ------------------------------------------------------------------------------------
         state: 'initial',
         
+        // Empty main view
+        // ------------------------------------------------------------------------------------
+        emptyMainAppView: function() {
+            // Remove views and free memory
+            while( ws.mainAppView.getChildren().length > 0 ) {
+                var child = ws.mainAppView.children[ws.mainAppView.getChildren().length-1];
+                Ti.API.info("Remove view " + child + " from main App View");
+                ws.mainAppView.remove(child);
+                child = null;
+            }
+        },
+        
         // Current Action
         // ------------------------------------------------------------------------------------
         currentAcion: 'default',
         
         action: function(name, params) {
             if( name !== this.currentAction ) {
-                ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});           
+                ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});
+                this.emptyMainAppView();
                 this.currentAction = name;
                 switch(name) {
                     case "default":
@@ -49,11 +62,11 @@ ws.Controller = (function(){
                         break;                    
                     
                     case "tracks":
-                    
+                        this.tracksAction();
                         break;
                         
                     case "classification":
-                    
+                        this.classificationAction();
                         break;
                         
                     case "riders":            
@@ -70,7 +83,19 @@ ws.Controller = (function(){
         // Default action
         // ------------------------------------------------------------------------------------
         defaultAction: function() {
-            
+            this.actionEnd();
+        },
+        
+        // Tracks action
+        // ------------------------------------------------------------------------------------
+        tracksAction: function() {
+            this.actionEnd();
+        },
+        
+        // Classification action
+        // ------------------------------------------------------------------------------------
+        classificationAction: function() {
+            this.actionEnd();
         },
         
         // Riders action
@@ -79,20 +104,27 @@ ws.Controller = (function(){
             var context = this;
             var onDataReady = function(riders) {                
                 var data = [];
+                var time = new Date().getTime();
                 for (var i = 0; i < riders.ids.length; i++) {
                     var riderId = riders.ids[i];
                     var rider = riders.riders[riderId];
-                    var imageNumber = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'images/riders/'+ rider.number +'.png');
-                    var flag = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'images/riders/'+ rider.flagCountry +'.png');
+                    var imageNumberFile = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'images/riders/'+ rider.number +'.png');
+                    // Ti.API.info(Ti.Filesystem.resourcesDirectory + 'images/riders/'+ rider.flagCountry +'.png');
+                    var imageNumber = null;
+                    if( imageNumberFile.exists() )
+                        imageNumber = '/images/riders/'+ rider.number +'.png';//imageNumberFile.read();
+                    else
+                        imageNumber = null;
+                    // var flag = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'images/riders/'+ rider.flagCountry +'.png');
                     data.push({
-                        icon: {
-                            image: imageNumber.exists()?imageNumber.read():''
+                        iconNumber: {
+                            image: imageNumber?imageNumber:''
                         },
                         number: {
-                            text: !imageNumber.exists()?rider.number:""
+                            text: !imageNumber?rider.number:''
                         },
                         flag: {
-                            image: flag.exists()?flag.read():''
+                            image: '/images/riders/'+ rider.flagCountry +'.png'
                         },
                         name: {
                             text: rider.name
@@ -105,19 +137,22 @@ ws.Controller = (function(){
                         },
                         properties: {
                             itemId: riderId,
-                            accessoryType: Ti.UI.LIST_ACCESSORY_TYPE_NONE
+                            accessoryType: Ti.UI.LIST_ACCESSORY_TYPE_NONE,
+                            backgroundColor: ((i%2==0)?'#fff':'#eee')
                         }
                     });
                 }
+                var time2 = new Date().getTime();
+                Ti.API.info("Time loading items: " + ws.utils.toSec(time2-time));
                 
                 // ListView            
                 ws.mainAppView.add(
                     Ti.UI.createListView({
                         top: 0,
-                        left: 16,
+                        left: 0,//16,
                         zIndex: 2,
                         separatorColor: '#eee',
-                        width: ws.platform.screenWidth() - 16,
+                        width: ws.platform.screenWidth(),// - 16,
                         height: ws.platform.screenHeight() - ws.topBar.height,
                         templates: {
                             default: context.template.get("main")
@@ -151,17 +186,47 @@ ws.Controller = (function(){
                 bubbleParent: false,
                 backgroundColor: '#fff'
             });
+            var imageNumber = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'images/riders/'+ rider.number +'.png');
+            var flag = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'images/riders/'+ rider.flagCountry +'.png');
+            if( imageNumber.exists() )
+                riderDetailView.add(
+                    Ti.UI.createImageView({
+                        image: imageNumber.read(),
+                        top: 7,
+                        left: 5,
+                        width: 75
+                    })
+                );
+            else
+                riderDetailView.add(
+                    Ti.UI.createLabel({
+                        text: rider.number,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: 55,
+                            fontFamily: ws.fonts.fontStyles.menu.fontFamily
+                        },
+                        color: '#333333',
+                        top: 0,
+                        left: 5,
+                        width: 75,
+                        zIndex: 0,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+                        height: Ti.UI.SIZE
+                    })
+                );
             riderDetailView.add(
                 Ti.UI.createLabel({
                     text: rider.name,
                     height: Ti.UI.SIZE,
-                    left: 15,    
-                    top: 4,      
+                    left: 90,    
+                    top: 7,      
                     font: {
-                        fontSize: ws.fonts.fontStyles.riderName.fontSize,
-                        fontFamily: ws.fonts.fontStyles.riderName.fontFamily
+                        fontWeight: 'bold',
+                        fontSize: ws.fonts.fontStyles.detailTitle.fontSize,
+                        fontFamily: ws.fonts.fontStyles.detailTitle.fontFamily
                     },
-                    color: ws.fonts.fontStyles.riderName.fontColor
+                    color: ws.fonts.fontStyles.detailTitle.fontColor
                     // verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
                 })
             );

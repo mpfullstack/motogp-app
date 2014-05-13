@@ -139,4 +139,9 @@ ws.fonts.addFontStyle({
     fontSize: 12,
     fontColor: '#999'
 });
+ws.fonts.addFontStyle({
+    id: 'detailTitle',
+    fontSize: 28,
+    fontColor: '#000'
+});
 // -----------------------------------------

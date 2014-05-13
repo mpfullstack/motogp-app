@@ -99,7 +99,7 @@ var onClickMainMenuOption = function(obj) {
         Ti.API.info("CLICK ON " + obj.source.id);
         ws.controller.action(obj.source.id);
         ws.mainMenu.setVisible(false);
-        ws.mainMenu.opacityView.setVisible(false);
+        ws.mainMenu.opacityView.hide();
     });
 }
 
