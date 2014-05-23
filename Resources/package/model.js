@@ -9,7 +9,8 @@ ws.Model = (function(){
     /* ------------------------------------------------------------------------------------- */
     var _LAST_CHECK_TIME_KEY = "lastCheckTime"; 
     var _xhr = null;
-    var _ridersData = null;    
+    var _ridersData = null;  
+    var _tracksData = null;  
     /* ------------------------------------------------------------------------------------- */ 
     
     var Model = function(options){
@@ -23,7 +24,11 @@ ws.Model = (function(){
     Model.prototype = {
         // Template object
         // ------------------------------------------------------------------------------------
-        timeout: 3000,
+        timeout: 6000,
+        
+        // Minimum time between index updates
+        // ------------------------------------------------------------------------------------
+        refreshTime: 1,//30000, // 5 minutes
         
         // Default host
         // ------------------------------------------------------------------------------------
@@ -33,8 +38,7 @@ ws.Model = (function(){
         // ------------------------------------------------------------------------------------
         initialize: function(options) {
             _xhr = Ti.Network.createHTTPClient({                    
-                timeout: this.timeout,
-                onerror: function(e){}
+                timeout: this.timeout
             });
             this.newDataCheck();
         },
@@ -50,19 +54,33 @@ ws.Model = (function(){
             var currentTime = new Date().getTime();
             Ti.API.info("lastCheckTime: " + lastCheckTime);
             Ti.API.info("currentTime: " + currentTime);
-            if( (currentTime - lastCheckTime) > 300000 ) {// 5 minutes
+            if( (currentTime - lastCheckTime) > this.refreshTime ) {
                 _xhr.onload = function() {
                     var indexFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'data', 'index.json');
-                    if( !indexFile.exists() )
+                    if( !indexFile.exists() ) {
                         indexFile.write(this.responseData);
-                    context.index = JSON.parse(indexFile.read().text);
+                        context.index = JSON.parse(this.responseText);
+                    } else {
+                        context.index = JSON.parse(indexFile.read().text);
+                    }
+                    Ti.API.info("index.json: " + this.responseText);                    
                     context.lastIndex = JSON.parse(this.responseText);
                 };
+                _xhr.onerror = function(){
+                    Ti.API.info("Error getting index.json");
+                    var indexFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'data', 'index.json');
+                    context.index = JSON.parse(indexFile.read().text);
+                    context.lastIndex = context.index;
+                }
                 _xhr.open('GET', this.host + '/data/index.json');
                 // if( bcn.BASIC_HTTP_AUTH )
                     // xhr2.setRequestHeader('Authorization','Basic ' + Ti.Utils.base64encode(bcn.USERNAME + ':' + bcn.PASSWORD));
                 _xhr.send();
                 this.setLastCheckTime(new Date().getTime());
+            } else {
+                var indexFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'data', 'index.json');
+                context.index = JSON.parse(indexFile.read().text);
+                context.lastIndex = context.index;
             }
         },
         
@@ -99,10 +117,10 @@ ws.Model = (function(){
         // ------------------------------------------------------------------------------------
         getRiders: function(callback) {
             var newDataAvailable = false;
-            // Ti.API.info("getRiders()")
-            // Ti.API.info("Last index: " + Date.parse(this.lastIndex.ridersLastUpdate));
-            // Ti.API.info("Current index: " + Date.parse(this.index.ridersLastUpdate));
+            Ti.API.info("getRiders()")
             if( this.lastIndex && this.index && Date.parse(this.lastIndex.ridersLastUpdate) > Date.parse(this.index.ridersLastUpdate) ) {
+                Ti.API.info("Last index: " + Date.parse(this.lastIndex.ridersLastUpdate));
+                Ti.API.info("Current index: " + Date.parse(this.index.ridersLastUpdate));
                 newDataAvailable = true;
                 this.index.ridersLastUpdate = this.lastIndex.ridersLastUpdate;
                 // Update index data to disk
@@ -130,7 +148,38 @@ ws.Model = (function(){
         // ------------------------------------------------------------------------------------
         getRider: function(id) {
             return _ridersData.riders[id];
-        }
+        },
+        
+        // Get tracks data
+        // ------------------------------------------------------------------------------------
+        getTracks: function(callback) {
+            var newDataAvailable = false;
+            Ti.API.info("getTracks()")
+            if( this.lastIndex && this.index && Date.parse(this.lastIndex.tracksLastUpdate) > Date.parse(this.index.tracksLastUpdate) ) {
+                Ti.API.info("Last index: " + Date.parse(this.lastIndex.tracksLastUpdate));
+                Ti.API.info("Current index: " + Date.parse(this.index.tracksLastUpdate));
+                newDataAvailable = true;
+                this.index.tracksLastUpdate = this.lastIndex.tracksLastUpdate;
+                // Update index data to disk
+                this.saveIndex();
+            }
+            var jsonTracksFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'data', 'tracks.json');
+            if( !jsonTracksFile.exists() || newDataAvailable ) {
+                _xhr.onload = function() {
+                    jsonTracksFile.write(this.responseData);
+                    _tracksData = JSON.parse(jsonTracksFile.read().text); 
+                    callback(_tracksData);
+                };
+                _xhr.open('GET', this.host + '/data/tracks/tracks.json');
+                // if( bcn.BASIC_HTTP_AUTH )
+                    // xhr2.setRequestHeader('Authorization','Basic ' + Ti.Utils.base64encode(bcn.USERNAME + ':' + bcn.PASSWORD));
+                _xhr.send();
+            } else {
+                if( !_tracksData )
+                    _tracksData = JSON.parse(jsonTracksFile.read().text);
+                callback(_tracksData);
+            }            
+        },
     };
     
     return Model;

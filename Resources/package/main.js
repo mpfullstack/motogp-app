@@ -29,15 +29,18 @@ ws.mainWindow = Ti.UI.createWindow({
 // TopBar
 // ----------------------------------------------------
 ws.topBar = new ws.menu.TopBar({
+    bgColor: '#eee',
     mainButton: new ws.ui.Button({
         imageUrl : '../images/menu.png',
         text: 'MotoGP',
-        color: ws.fonts.fontStyles.title.fontColor,
+        color: '#b00d35',
         font: {
             fontSize : ws.fonts.fontStyles.title.fontSize,
-            fontFamily : ws.fonts.fontStyles.title.fontSize.fontFamily
+            fontFamily : ws.fonts.fontStyles.title.fontSize.fontFamily,
+            fontWeight: 'bold',
+            fontStyle: 'italic'
         },
-        onTouchBgColor : '#666',
+        onTouchBgColor : '#aaa',
         onClick : function(e) {
             if (!ws.mainMenu.isVisible()) {
                 ws.mainMenu.opacityView.show();
@@ -72,6 +75,7 @@ ws.topBar = new ws.menu.TopBar({
         }
     })
 });
+ws.topBar.mainButton.setImageLeft(0);
 ws.mainWindow.add(ws.topBar.view);
 
 // MainMenu
@@ -81,7 +85,7 @@ ws.mainMenu = new ws.menu.Main({
     top: ws.topBar.height,
     height: ws.platform.screenHeight() - ws.topBar.height,
     width: ws.platform.screenWidth() / 8 * 6,
-    bgColor: "#fff",
+    bgColor: "#333",
     mainWindow: ws.mainWindow
 });
 
@@ -127,9 +131,10 @@ for( var i=0; i<mainMenuOptions.length; i++ ) {
         id: mainMenuOptions[i].id,
         font: {
             fontSize : ws.fonts.fontStyles.menu.fontSize,
-            fontFamily : ws.fonts.fontStyles.menu.fontFamily
+            fontFamily : ws.fonts.fontStyles.menu.fontFamily,
+            fontWeight: 'bold'
         },
-        color: '#333',
+        color: '#eee',
         imageUrl: mainMenuOptions[i].imageUrl,
         imageSize: 28,
         height: 50,

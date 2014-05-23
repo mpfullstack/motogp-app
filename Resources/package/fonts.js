@@ -117,7 +117,7 @@ ws.fonts.add({
 ws.fonts.addFontStyle({
     id: 'title',
     fontSize: 20,
-    fontColor: '#fff'
+    fontColor: '#333'
 });
 ws.fonts.addFontStyle({
     id: 'menu',    
@@ -133,6 +133,16 @@ ws.fonts.addFontStyle({
     id: 'team',    
     fontSize: 14,
     fontColor: '#333'
+});
+ws.fonts.addFontStyle({
+    id: 'regular',
+    fontSize: 14,
+    fontColor: '#666'
+});
+ws.fonts.addFontStyle({
+    id: 'details',
+    fontSize: 12,
+    fontColor: '#666'
 });
 ws.fonts.addFontStyle({
     id: 'town',    

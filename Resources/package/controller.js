@@ -47,6 +47,32 @@ ws.Controller = (function(){
             }
         },
         
+        // StackTrace App
+        // ------------------------------------------------------------------------------------        
+        stackTrace: ['default'],
+        
+        // Add action to stack trace
+        // ------------------------------------------------------------------------------------        
+        pushStackTrace: function(value) {
+            if( this.stackTrace.length ) {
+                var pos = this.stackTrace.lastIndexOf(value);
+                if( pos !== -1 ) {
+                    this.stackTrace = this.stackTrace.slice(0,pos+1);
+                } else {
+                    this.stackTrace.push(value);                    
+                }
+            } else {
+                this.stackTrace.push(value);
+            }
+            Ti.API.info(JSON.stringify("Stack Trace: " + this.stackTrace));
+        },
+        
+        // Pops last action from stack trace 
+        // ------------------------------------------------------------------------------------        
+        popStackTrace: function() {
+            return this.stackTrace.pop();
+        },
+        
         // Current Action
         // ------------------------------------------------------------------------------------
         currentAcion: 'default',
@@ -56,24 +82,31 @@ ws.Controller = (function(){
                 ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});
                 this.emptyMainAppView();
                 this.currentAction = name;
+                this.pushStackTrace(name);
                 switch(name) {
                     case "default":
+                        ws.topBar.mainButton.setText("MotoGP");
                         this.defaultAction();
                         break;                    
                     
                     case "tracks":
+                        ws.topBar.mainButton.setText("TRACKS");                    
                         this.tracksAction();
                         break;
                         
                     case "classification":
+                        ws.topBar.mainButton.setText("CLASSIFICATION");
                         this.classificationAction();
                         break;
                         
-                    case "riders":            
+                    case "riders":
+                        ws.topBar.mainButton.setText("RIDERS");            
                         this.ridersAction();
                         break;
                     
                     case "riderDetail":
+                        ws.topBar.mainButton.setText("");
+                        ws.topBar.mainButton.setImage("/images/arrow_back.png");
                         this.riderDetailAction(params);
                         break;
                 }
@@ -89,7 +122,67 @@ ws.Controller = (function(){
         // Tracks action
         // ------------------------------------------------------------------------------------
         tracksAction: function() {
-            this.actionEnd();
+            var context = this;
+            var onDataReady = function(tracks) {                
+                var data = [];
+                var time = new Date().getTime();
+                for (var i = 0; i < tracks.ids.length; i++) {
+                    var trackId = tracks.ids[i];
+                    var track = tracks.tracks[trackId];
+                    var done = false;
+                    if( track.date && new Date() > new Date(track.date) )
+                        done = true;
+                    data.push({
+                        name: {
+                            text: track.name
+                        },
+                        trackImage: {
+                            image: track.image
+                        },
+                        textDate: {
+                            text: track.textDate
+                        },
+                        length: {
+                            text: track.length + " m"
+                        },
+                        constructed: {
+                            text: track.constructed
+                        },                        
+                        properties: {
+                            itemId: trackId,
+                            accessoryType: Ti.UI.LIST_ACCESSORY_TYPE_NONE,
+                            backgroundColor: (done?'#eee':'#fff')//((i%2==0)?'#fff':'#eee'))
+                        }
+                    });
+                }
+                var time2 = new Date().getTime();
+                Ti.API.info("Time loading items: " + ws.utils.toSec(time2-time));
+                
+                // ListView            
+                ws.mainAppView.add(
+                    Ti.UI.createListView({
+                        top: 0,
+                        left: 0,//16,
+                        zIndex: 2,
+                        separatorColor: '#aaa',
+                        width: ws.platform.screenWidth(),// - 16,
+                        height: ws.platform.screenHeight() - ws.topBar.height,
+                        templates: {
+                            default: context.template.get("trackList")
+                        },
+                        defaultItemTemplate: 'default',
+                        sections: [
+                            Ti.UI.createListSection({
+                                items: data
+                            })
+                        ],
+                        bubbleParent: false
+                    })
+                );               
+                context.actionEnd();
+            }
+            // Get riders data            
+            this.model.getTracks(onDataReady);
         },
         
         // Classification action
@@ -151,11 +244,11 @@ ws.Controller = (function(){
                         top: 0,
                         left: 0,//16,
                         zIndex: 2,
-                        separatorColor: '#eee',
+                        separatorColor: '#ccc',
                         width: ws.platform.screenWidth(),// - 16,
                         height: ws.platform.screenHeight() - ws.topBar.height,
                         templates: {
-                            default: context.template.get("main")
+                            default: context.template.get("riderList")
                         },
                         defaultItemTemplate: 'default',
                         sections: [
@@ -166,6 +259,13 @@ ws.Controller = (function(){
                         bubbleParent: false
                     })
                 );
+                ws.mainAppView.getChildren()[0].setMarker({
+                    sectionIndex: 0,
+                    itemIndex: riders.ids.length-1
+                });
+                ws.mainAppView.getChildren()[0].addEventListener("marker", function(e) {
+                    Ti.API.info("marker event fired!!");
+                });
                 context.actionEnd();
             }
             // Get riders data            
