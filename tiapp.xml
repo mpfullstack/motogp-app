@@ -11,11 +11,13 @@
     <version>1.0</version>
     <publisher>WS</publisher>
     <url>http://www.welvisolutions.com</url>
-    <description>App offering all information about MotoGP, Moto2 and Moto3.</description>
+    <description>Application that gives you information about riders, races and championchip classification of MotoGP.</description>
     <copyright>2014 by WS</copyright>
     <icon>appicon.png</icon>
+    <statusbar-style>default</statusbar-style>
+    <statusbar-hidden>false</statusbar-hidden>
     <fullscreen>false</fullscreen>
-    <navbar-hidden>false</navbar-hidden>
+    <navbar-hidden>true</navbar-hidden>
     <analytics>true</analytics>
     <guid>8a700047-b57e-452c-8e2a-8a3f4b6d9ff8</guid>
     <property name="ti.ui.defaultunit" type="string">dp</property>
@@ -44,15 +46,13 @@
             </dict>
         </plist>
     </ios>
-    <android xmlns:android="http://schemas.android.com/apk/res/android"/>
-    <mobileweb>
-        <precache/>
-        <splash>
-            <enabled>true</enabled>
-            <inline-css-images>true</inline-css-images>
-        </splash>
-        <theme>default</theme>
-    </mobileweb>
+    <android xmlns:android="http://schemas.android.com/apk/res/android">
+    	<manifest>
+        <application android:theme="@style/Theme.NoActionBar"/>
+	        <!-- Need to specify at least API level 11 for Titanium SDK 3.2.x and prior -->
+	        <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="19"/>
+	    </manifest>
+	</android>
     <modules>
         <module platform="commonjs">ti.cloud</module>
     </modules>
@@ -64,5 +64,5 @@
         <target device="mobileweb">false</target>
         <target device="tizen">false</target>
     </deployment-targets>
-    <sdk-version>3.2.3.GA</sdk-version>
+    <sdk-version>3.4.0.GA</sdk-version>
 </ti:app>
