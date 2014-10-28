@@ -1,8 +1,8 @@
-#appname: MotoGP
-#publisher: welvi
-#url: http://www.welvisolutions.com
-#image: appicon.png
-#appid: com.welvisolutions.motogp
-#desc: undefined
-#type: mobile
-#guid: 8a700047-b57e-452c-8e2a-8a3f4b6d9ff8
+#appname:MotoGP
+#publisher:WS
+#url:http://www.welvisolutions.com
+#image:appicon.png
+#appid:com.welvisolutions.motogp
+#desc:Application that gives you information about riders, races and championchip classification of MotoGP.
+#type:mobile
+#guid:8a700047-b57e-452c-8e2a-8a3f4b6d9ff8
