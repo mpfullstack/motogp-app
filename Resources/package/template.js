@@ -124,7 +124,7 @@ ws.Template = (function(){
                     type: 'Ti.UI.ImageView',
                     bindId: 'arrow',
                     properties: {
-                        image: '/images/arrow.png',
+                        image: '/images/arrow_light.png',
                         top: 38,
                         right: 5,
                         width: 24,
@@ -136,14 +136,14 @@ ws.Template = (function(){
             "trackList": {
                 properties: {
                     height: 150,
-                    selectedBackgroundColor: '#bbb'
+                    selectedBackgroundColor: '#999'
                 },
                 events: {
                     // Bind event callbacks for bubbled events
                     // Events caught here are fired by the subcomponent views of the ListItem
                     click: function(e) {
                         Ti.API.info("click item id: " +e.itemId);
-                        //ws.controller.action('trackDetail', e.itemId);
+                        ws.controller.action('trackDetail', e.itemId);
                     }
                 },
                 childTemplates: [{
@@ -151,7 +151,7 @@ ws.Template = (function(){
                     bindId: 'trackImage',
                     properties: {
                         image: '',
-                        top: 15,
+                        top: 20,
                         left: 11,
                         width: 130,
                         zIndex: 1
@@ -162,11 +162,11 @@ ws.Template = (function(){
                     bindId: 'name',
                     properties: {
                         font: {
-                            fontSize: ws.fonts.fontStyles.riderName.fontSize,
-                            fontFamily: ws.fonts.fontStyles.riderName.fontFamily,
+                            fontSize: ws.fonts.fontStyles.trackName.fontSize,
+                            fontFamily: ws.fonts.fontStyles.trackName.fontFamily,
                             fontWeight: 'bold'
                         },
-                        color: ws.fonts.fontStyles.riderName.fontColor,
+                        color: ws.fonts.fontStyles.trackName.fontColor,
                         top: 4,
                         left: 11,
                         width: Ti.UI.SIZE,
@@ -188,13 +188,14 @@ ws.Template = (function(){
                     {
                         type: 'Ti.UI.View',
                         properties: {                        
-                            top: 5,
+                            top: 38,
                             left: 0,
                             width: Ti.UI.FILL,
                             height: Ti.UI.SIZE,
                             layout: 'horizontal'
                         },
-                        childTemplates: [{
+                        childTemplates: [
+                        /*{
                             type: 'Ti.UI.Label',
                             properties: {
                                 font: {
@@ -205,11 +206,11 @@ ws.Template = (function(){
                                 color: ws.fonts.fontStyles.details.fontColor,
                                 top: 0,
                                 left: 0,
-                                text: 'Fecha:',
+                                text: ws.translations.translate('date') +':',
                                 width: Ti.UI.SIZE,
                                 height: Ti.UI.SIZE
                             }
-                        },
+                        },*/
                         {
                             type: 'Ti.UI.Label',
                             bindId: 'textDate',
@@ -237,7 +238,8 @@ ws.Template = (function(){
                             height: Ti.UI.SIZE,
                             layout: 'horizontal'
                         },
-                        childTemplates: [{
+                        childTemplates: [
+                        /*{
                             type: 'Ti.UI.Label',
                             properties: {
                                 font: {
@@ -248,11 +250,11 @@ ws.Template = (function(){
                                 color: ws.fonts.fontStyles.details.fontColor,
                                 top: 0,
                                 left: 0,
-                                text: 'Longitud:',
+                                text: ws.translations.translate('length') +':',
                                 width: Ti.UI.SIZE,
                                 height: Ti.UI.SIZE
                             }
-                        },
+                        },*/
                         {
                             type: 'Ti.UI.Label',
                             bindId: 'length',
@@ -262,7 +264,7 @@ ws.Template = (function(){
                                     fontFamily: ws.fonts.fontStyles.details.fontFamily
                                 },
                                 color: ws.fonts.fontStyles.details.fontColor,
-                                top: 0,
+                                top: 5,
                                 left: 5,
                                 width: Ti.UI.SIZE,
                                 height: Ti.UI.SIZE
@@ -280,7 +282,8 @@ ws.Template = (function(){
                             height: Ti.UI.SIZE,
                             layout: 'horizontal'
                         },
-                        childTemplates: [{
+                        childTemplates: [
+                        /*{
                             type: 'Ti.UI.Label',
                             properties: {
                                 font: {
@@ -291,11 +294,11 @@ ws.Template = (function(){
                                 color: ws.fonts.fontStyles.details.fontColor,
                                 top: 0,
                                 left: 0,
-                                text: 'Construido:',
+                                text: ws.translations.translate('constructed'),
                                 width: Ti.UI.SIZE,
                                 height: Ti.UI.SIZE
                             }
-                        },
+                        },*/
                         {
                             type: 'Ti.UI.Label',
                             bindId: 'constructed',
@@ -305,13 +308,24 @@ ws.Template = (function(){
                                     fontFamily: ws.fonts.fontStyles.details.fontFamily
                                 },
                                 color: ws.fonts.fontStyles.details.fontColor,
-                                top: 0,
+                                top: 5,
                                 left: 5,
                                 width: Ti.UI.SIZE,
                                 height: Ti.UI.SIZE
                             }
                         }],
                     }]
+                },
+                {
+                    type: 'Ti.UI.ImageView',
+                    bindId: 'arrow',
+                    properties: {
+                        image: '/images/arrow.png',
+                        top: 63,
+                        right: 5,
+                        width: 24,
+                        height: 24
+                    }
                 }]
             }       
         },

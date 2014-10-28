@@ -1,12 +1,20 @@
+// Main and global objects
+// -----------------------------------------
+ws.platform = new ws.utils.Platform();
+ws.translations = new ws.Translations({
+    "defaultLanguage": "es",
+    "allowedLanguages": ["ca","es","en"]
+});
+// -----------------------------------------
+
 // Include App files
 // -----------------------------------------
+Ti.include('translations.js');
 Ti.include('fonts.js');
 Ti.include('model.js');
 Ti.include('template.js');
 Ti.include('controller.js');
 // -----------------------------------------
-
-ws.platform = new ws.utils.Platform();
 
 // -----------------------------------------
 // Main UI App
@@ -42,40 +50,12 @@ ws.topBar = new ws.menu.TopBar({
         },
         onTouchBgColor : '#aaa',
         onClick : function(e) {
-            if (!ws.mainMenu.isVisible()) {
-                ws.mainMenu.opacityView.show();
-                ws.mainMenu.setVisible(true);
-                ws.animation.slideFrom({
-                    view : ws.mainMenu.view,
-                    left: ws.mainMenu.paddingLeft,
-                    direction : 'left',
-                    onComplete : function(e) {}
-                });
-                var opacity = ws.mainMenu.width / ((ws.mainMenu.width + ws.mainMenu.opacityOffset) * 0.01) / 100;
-                ws.mainMenu.opacityView.animate({
-                    opacity : opacity,
-                    duration : 300
-                });
-            } else {
-                ws.animation.slideTo({
-                    view : ws.mainMenu.view,
-                    direction : 'left',
-                    onComplete : function(e) {
-                        ws.mainMenu.setVisible(false);
-                    }
-                });
-                ws.mainMenu.opacityView.animate({
-                    opacity : 0,
-                    duration : 300                    
-                },
-                function(e) {
-                    ws.mainMenu.opacityView.hide()
-                });
-            }
+            ws.controller.actionBack();
         }
     })
 });
 ws.topBar.mainButton.setImageLeft(0);
+ws.topBar.mainButton.setTextProperty("left", 0);
 ws.mainWindow.add(ws.topBar.view);
 
 // MainMenu
@@ -109,17 +89,17 @@ var onClickMainMenuOption = function(obj) {
 
 var mainMenuOptions = [
     {
-        text: "TRACKS",
+        text: ws.translations.translate('tracks').toUpperCase(),
         id: "tracks",
         imageUrl: '/images/tracks.png'
     },
     {
-        text: "CLASSIFICATION",
+        text: ws.translations.translate('classification').toUpperCase(),
         id: "classification",
         imageUrl: '/images/classification.png'
     },
     {
-        text: "RIDERS",
+        text: ws.translations.translate('riders').toUpperCase(),
         id: "riders",
         imageUrl: '/images/riders.png'
     }

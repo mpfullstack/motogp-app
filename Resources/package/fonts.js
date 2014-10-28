@@ -81,7 +81,7 @@ ws.Fonts = (function(){
         addFontStyle: function(fontStyle) {
             this.fontStyles[fontStyle.id] = {
                 fontSize:   fontStyle.fontSize?fontStyle.fontSize:this.fontSize,
-                fontFamily: this.fonts[fontStyle.fontId]?this.fonts[fontStyle.fontId].name:this.fontFamily,
+                fontFamily: this.fonts[fontStyle.fontId]?this.fonts[fontStyle.fontId].fontFamily:this.fontFamily,
                 fontColor:  fontStyle.fontColor?fontStyle.fontColor:this.fontColor
             }
         },
@@ -114,6 +114,10 @@ ws.fonts.add({
     id: 'oSansRegular', 
     name: 'OpenSans-Regular'
 });
+ws.fonts.add({
+    id: 'oSansExtraBold', 
+    name: 'OpenSans-ExtraBold'
+});
 ws.fonts.addFontStyle({
     id: 'title',
     fontSize: 20,
@@ -123,6 +127,10 @@ ws.fonts.addFontStyle({
     id: 'menu',    
     fontSize: 18,
     fontColor: '#eee'
+});
+ws.fonts.addFontStyle({
+    id: 'subMenu',    
+    fontSize: 14
 });
 ws.fonts.addFontStyle({
     id: 'riderName',    
@@ -136,13 +144,13 @@ ws.fonts.addFontStyle({
 });
 ws.fonts.addFontStyle({
     id: 'regular',
-    fontSize: 14,
+    fontSize: 16,
     fontColor: '#666'
 });
 ws.fonts.addFontStyle({
     id: 'details',
-    fontSize: 12,
-    fontColor: '#666'
+    fontSize: 14,
+    fontColor: '#eee'
 });
 ws.fonts.addFontStyle({
     id: 'town',    
@@ -150,8 +158,23 @@ ws.fonts.addFontStyle({
     fontColor: '#999'
 });
 ws.fonts.addFontStyle({
+    id: 'trackName',    
+    fontSize: 18,
+    fontColor: '#fff'
+});
+ws.fonts.addFontStyle({
     id: 'detailTitle',
-    fontSize: 28,
-    fontColor: '#000'
+    fontSize: 24,
+    fontColor: '#fff',
+    fontId: 'oSansExtraBold'
+});
+ws.fonts.addFontStyle({
+    id: 'detailTrackMenuView',
+    fontSize: 18
+});
+ws.fonts.addFontStyle({
+    id: 'detailTrackDate',
+    fontSize: 16,
+    fontColor: '#fff'
 });
 // -----------------------------------------

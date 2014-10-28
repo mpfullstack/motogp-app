@@ -26,13 +26,13 @@ ws.Model = (function(){
         // ------------------------------------------------------------------------------------
         timeout: 6000,
         
-        // Minimum time between index updates
+        // Minimum time between index updates (milliseconds)
         // ------------------------------------------------------------------------------------
         refreshTime: 1,//30000, // 5 minutes
         
         // Default host
         // ------------------------------------------------------------------------------------
-        host: 'http://motogp.welvi.com',  
+        host: 'http://clients.welvisolutions.com', //'http://motogp.welvi.com',  
         
         // Initialize
         // ------------------------------------------------------------------------------------
@@ -43,7 +43,8 @@ ws.Model = (function(){
             this.newDataCheck();
         },
         
-        // Checks for data updates
+        // Checks for data updates.
+        // If more than refreshTime seconds since lastTime, then get new index 
         // ------------------------------------------------------------------------------------
         newDataCheck: function() {
             var context = this;
@@ -52,19 +53,18 @@ ws.Model = (function(){
                 dataPath.createDirectory();
             var lastCheckTime = this.getLastCheckTime();
             var currentTime = new Date().getTime();
-            Ti.API.info("lastCheckTime: " + lastCheckTime);
-            Ti.API.info("currentTime: " + currentTime);
-            if( (currentTime - lastCheckTime) > this.refreshTime ) {
+            if( (currentTime - lastCheckTime) > this.refreshTime ) {                
                 _xhr.onload = function() {
                     var indexFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'data', 'index.json');
                     if( !indexFile.exists() ) {
                         indexFile.write(this.responseData);
                         context.index = JSON.parse(this.responseText);
                     } else {
-                        context.index = JSON.parse(indexFile.read().text);
+                        context.index = JSON.parse(indexFile.read().text);                         
                     }
-                    Ti.API.info("index.json: " + this.responseText);                    
                     context.lastIndex = JSON.parse(this.responseText);
+                    Ti.API.info("index: " + context.index.tracksLastUpdate);
+                    Ti.API.info("lastIndex: " + context.lastIndex.tracksLastUpdate);
                 };
                 _xhr.onerror = function(){
                     Ti.API.info("Error getting index.json");
@@ -119,8 +119,8 @@ ws.Model = (function(){
             var newDataAvailable = false;
             Ti.API.info("getRiders()")
             if( this.lastIndex && this.index && Date.parse(this.lastIndex.ridersLastUpdate) > Date.parse(this.index.ridersLastUpdate) ) {
-                Ti.API.info("Last index: " + Date.parse(this.lastIndex.ridersLastUpdate));
-                Ti.API.info("Current index: " + Date.parse(this.index.ridersLastUpdate));
+                // Ti.API.info("Last index: " + Date.parse(this.lastIndex.ridersLastUpdate));
+                // Ti.API.info("Current index: " + Date.parse(this.index.ridersLastUpdate));
                 newDataAvailable = true;
                 this.index.ridersLastUpdate = this.lastIndex.ridersLastUpdate;
                 // Update index data to disk
@@ -154,10 +154,29 @@ ws.Model = (function(){
         // ------------------------------------------------------------------------------------
         getTracks: function(callback) {
             var newDataAvailable = false;
+            
+            // Function to sort tracks by date ascending being first 
+            // the ones pending and after the ones already done.
+            var sortTracks = function(tracksData) {
+                var trackIds = tracksData.ids;
+                var doneTrackIds = [];
+                var pendingTrackIds = [];
+                for( var i=0; i<trackIds.length; i++ ) {
+                    var track = tracksData.tracks[trackIds[i]];
+                    if( new Date() > new Date(track.date) ) {
+                        doneTrackIds.push(trackIds[i]);
+                    } else {
+                        pendingTrackIds.push(trackIds[i]);
+                    }
+                }
+                tracksData.ids = pendingTrackIds.concat(doneTrackIds);
+                return tracksData;
+            }      
+            
             Ti.API.info("getTracks()")
             if( this.lastIndex && this.index && Date.parse(this.lastIndex.tracksLastUpdate) > Date.parse(this.index.tracksLastUpdate) ) {
-                Ti.API.info("Last index: " + Date.parse(this.lastIndex.tracksLastUpdate));
-                Ti.API.info("Current index: " + Date.parse(this.index.tracksLastUpdate));
+                // Ti.API.info("Last index: " + Date.parse(this.lastIndex.tracksLastUpdate));
+                // Ti.API.info("Current index: " + Date.parse(this.index.tracksLastUpdate));
                 newDataAvailable = true;
                 this.index.tracksLastUpdate = this.lastIndex.tracksLastUpdate;
                 // Update index data to disk
@@ -167,7 +186,7 @@ ws.Model = (function(){
             if( !jsonTracksFile.exists() || newDataAvailable ) {
                 _xhr.onload = function() {
                     jsonTracksFile.write(this.responseData);
-                    _tracksData = JSON.parse(jsonTracksFile.read().text); 
+                    _tracksData = sortTracks(JSON.parse(jsonTracksFile.read().text));
                     callback(_tracksData);
                 };
                 _xhr.open('GET', this.host + '/data/tracks/tracks.json');
@@ -176,10 +195,16 @@ ws.Model = (function(){
                 _xhr.send();
             } else {
                 if( !_tracksData )
-                    _tracksData = JSON.parse(jsonTracksFile.read().text);
+                    _tracksData = sortTracks(JSON.parse(jsonTracksFile.read().text));
                 callback(_tracksData);
-            }            
+            }                    
         },
+        
+        // Get track data
+        // ------------------------------------------------------------------------------------
+        getTrack: function(id) {
+            return _tracksData.tracks[id];
+        }
     };
     
     return Model;
