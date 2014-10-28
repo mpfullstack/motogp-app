@@ -5,6 +5,7 @@ Ti.include("ws/dependencies.js");
 ws.dependencies.include("ui");
 ws.dependencies.include("menu");
 ws.dependencies.include("animation");
+ws.dependencies.include("translations");
 /* ------------------ */
 
 /* Include App main package */
