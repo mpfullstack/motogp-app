@@ -403,10 +403,10 @@ ws.Controller = (function(){
                     top: 7,      
                     font: {
                         fontWeight: 'bold',
-                        fontSize: ws.fonts.fontStyles.detailTitle.fontSize,
-                        fontFamily: ws.fonts.fontStyles.detailTitle.fontFamily
+                        fontSize: ws.fonts.fontStyles.detailRiderTitle.fontSize,
+                        fontFamily: ws.fonts.fontStyles.detailRiderTitle.fontFamily
                     },
-                    color: ws.fonts.fontStyles.detailTitle.fontColor
+                    color: ws.fonts.fontStyles.detailRiderTitle.fontColor
                     // verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
                 })
             );
@@ -670,21 +670,72 @@ ws.Controller = (function(){
                     color: '#333'
                 })
             );
-            contentView.add(
-                Ti.UI.createLabel({
-                    text: ws.translations.translate('date') + ": " + track.textDate,
-                    height: Ti.UI.SIZE,
-                    left: '3%',
-                    width: '94%',    
-                    top: 50,
-                    font: {
-                        fontSize: ws.fonts.fontStyles.regular.fontSize,
-                        fontFamily: ws.fonts.fontStyles.regular.fontFamily
-                    },
-                    visible: false,
-                    color: '#333'
-                })
-            );
+            // Render Track Schedule
+            var timeTableView = Ti.UI.createView({
+                height: Ti.UI.SIZE,
+                left: '3%',
+                width: '94%',
+                top: 50,
+                visible: false,
+                layout: 'vertical'
+            });
+            contentView.add(timeTableView);            
+            for( var d in track.timetable ) {                
+                timeTableView.add(
+                    Ti.UI.createLabel({
+                        text: d,
+                        height: Ti.UI.SIZE,
+                        left: 0,
+                        width: '100%',    
+                        top: 0,
+                        font: {
+                            fontSize: ws.fonts.fontStyles.regular.fontSize,
+                            fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                        },
+                        color: '#b00d35'
+                    })
+                );
+                var rows = track.timetable[d];
+                for( var i=0; i<rows.length; i++ ) {
+                    var row = rows[i];
+                    timeTableView.add(
+                        Ti.UI.createView({
+                            height: Ti.UI.SIZE,
+                            left: 0,
+                            width: '100%',
+                            top: 0
+                        })
+                    );
+                    timeTableView.children[timeTableView.children.length-1].add(
+                        Ti.UI.createLabel({
+                            text: row.session,
+                            height: Ti.UI.SIZE,
+                            left: 0,
+                            width: Ti.UI.SIZE,    
+                            top: 0,
+                            font: {
+                                fontSize: ws.fonts.fontStyles.regular.fontSize,
+                                fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                            },                            
+                            color: '#666'
+                        })
+                    );
+                    timeTableView.children[timeTableView.children.length-1].add(
+                        Ti.UI.createLabel({
+                            text: row.time,
+                            height: Ti.UI.SIZE,
+                            right: 0,
+                            width: Ti.UI.SIZE,    
+                            top: 0,
+                            font: {
+                                fontSize: ws.fonts.fontStyles.regular.fontSize,
+                                fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                            },                            
+                            color: '#666'
+                        })
+                    );
+                }
+            }
             mainTrackDetailView.children[1].add( contentView );                   
             ws.mainAppView.add( mainTrackDetailView );
             this.actionEnd();

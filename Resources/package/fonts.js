@@ -163,6 +163,12 @@ ws.fonts.addFontStyle({
     fontColor: '#fff'
 });
 ws.fonts.addFontStyle({
+    id: 'detailRiderTitle',
+    fontSize: 24,
+    fontColor: '#000',
+    fontId: 'oSansExtraBold'
+});
+ws.fonts.addFontStyle({
     id: 'detailTitle',
     fontSize: 24,
     fontColor: '#fff',

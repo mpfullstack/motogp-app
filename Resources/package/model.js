@@ -163,6 +163,7 @@ ws.Model = (function(){
                 var pendingTrackIds = [];
                 for( var i=0; i<trackIds.length; i++ ) {
                     var track = tracksData.tracks[trackIds[i]];
+                    track = formatTimeTableData(track);
                     if( new Date() > new Date(track.date) ) {
                         doneTrackIds.push(trackIds[i]);
                     } else {
@@ -172,6 +173,29 @@ ws.Model = (function(){
                 tracksData.ids = pendingTrackIds.concat(doneTrackIds);
                 return tracksData;
             }      
+            
+            // Function to format timetable data
+            var formatTimeTableData = function(trackData) {
+                var data = {};
+                var key;
+                var timetable = trackData.timetable;
+                var rows = timetable.split("\n");
+                for( var i=0; i<rows.length; i++ ) {
+                    var row = rows[i];
+                    var columns = row.split("-");
+                    if( columns.length == 1 ) {
+                        key = columns[0];
+                        data[key] = [];
+                    } else {
+                        data[key].push({
+                            "session": columns[0],
+                            "time":    columns[1]
+                        });  
+                    }             
+                }
+                trackData.timetable = data;
+                return trackData;
+            }
             
             Ti.API.info("getTracks()")
             if( this.lastIndex && this.index && Date.parse(this.lastIndex.tracksLastUpdate) > Date.parse(this.index.tracksLastUpdate) ) {
