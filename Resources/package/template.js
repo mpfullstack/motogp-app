@@ -146,17 +146,7 @@ ws.Template = (function(){
                         ws.controller.action('trackDetail', e.itemId);
                     }
                 },
-                childTemplates: [{
-                    type: 'Ti.UI.ImageView',
-                    bindId: 'trackImage',
-                    properties: {
-                        image: '',
-                        top: 20,
-                        left: 11,
-                        width: 130,
-                        zIndex: 1
-                    }
-                },
+                childTemplates: [
                 {
                     type: 'Ti.UI.Label',
                     bindId: 'name',
@@ -174,147 +164,96 @@ ws.Template = (function(){
                     }
                 },
                 {
+                    type: 'Ti.UI.ImageView',
+                    bindId: 'trackImage',
+                    properties: {
+                        image: '',
+                        top: 20,
+                        left: 11,
+                        width: 130,
+                        zIndex: 1
+                    }
+                },
+                {
                     type: 'Ti.UI.View',
                     properties: {                        
-                        top: 10,
+                        top: 38,
                         left: 150,
                         width: Ti.UI.FILL,
                         height: Ti.UI.SIZE,
                         layout: 'vertical'
                     },
                     childTemplates: [
-                    // Dates Label
+                    // Date
                     // -----------------------------------
                     {
-                        type: 'Ti.UI.View',
-                        properties: {                        
-                            top: 38,
-                            left: 0,
-                            width: Ti.UI.FILL,
-                            height: Ti.UI.SIZE,
-                            layout: 'horizontal'
-                        },
-                        childTemplates: [
-                        /*{
-                            type: 'Ti.UI.Label',
-                            properties: {
-                                font: {
-                                    fontSize: ws.fonts.fontStyles.details.fontSize,
-                                    fontFamily: ws.fonts.fontStyles.details.fontFamily,
-                                    fontWeight: 'bold'
-                                },
-                                color: ws.fonts.fontStyles.details.fontColor,
-                                top: 0,
-                                left: 0,
-                                text: ws.translations.translate('date') +':',
-                                width: Ti.UI.SIZE,
-                                height: Ti.UI.SIZE
-                            }
-                        },*/
-                        {
-                            type: 'Ti.UI.Label',
-                            bindId: 'textDate',
-                            properties: {
-                                font: {
-                                    fontSize: ws.fonts.fontStyles.details.fontSize,
-                                    fontFamily: ws.fonts.fontStyles.details.fontFamily
-                                },
-                                color: ws.fonts.fontStyles.details.fontColor,
-                                top: 0,
-                                left: 5,
-                                width: Ti.UI.SIZE,
-                                height: Ti.UI.SIZE
-                            }
-                        }]
+                        type: 'Ti.UI.Label',
+                        bindId: 'textDate',
+                        properties: {
+                            font: {
+                                fontSize: ws.fonts.fontStyles.details.fontSize,
+                                fontFamily: ws.fonts.fontStyles.details.fontFamily,
+                                fontWeight: 'bold'
+                            },
+                            color: ws.fonts.fontStyles.details.fontColor,
+                            top: 0,
+                            left: 5,
+                            width: Ti.UI.SIZE,
+                            height: Ti.UI.SIZE
+                        }
+                    },
+                    // TV
+                    // -----------------------------------                
+                    {
+                        type: 'Ti.UI.Label',
+                        bindId: 'tv',
+                        properties: {
+                            font: {
+                                fontSize: ws.fonts.fontStyles.details.fontSize,
+                                fontFamily: ws.fonts.fontStyles.details.fontFamily
+                            },
+                            color: ws.fonts.fontStyles.details.fontColor,
+                            top: 5,
+                            left: 5,
+                            width: Ti.UI.SIZE,
+                            height: Ti.UI.SIZE
+                        }
                     },
                     // Length Label
-                    // -----------------------------------
+                    // -----------------------------------                
                     {
-                        type: 'Ti.UI.View',
-                        properties: {                        
-                            top: 0,
-                            left: 0,
-                            width: Ti.UI.FILL,
-                            height: Ti.UI.SIZE,
-                            layout: 'horizontal'
-                        },
-                        childTemplates: [
-                        /*{
-                            type: 'Ti.UI.Label',
-                            properties: {
-                                font: {
-                                    fontSize: ws.fonts.fontStyles.details.fontSize,
-                                    fontFamily: ws.fonts.fontStyles.details.fontFamily,
-                                    fontWeight: 'bold'
-                                },
-                                color: ws.fonts.fontStyles.details.fontColor,
-                                top: 0,
-                                left: 0,
-                                text: ws.translations.translate('length') +':',
-                                width: Ti.UI.SIZE,
-                                height: Ti.UI.SIZE
-                            }
-                        },*/
-                        {
-                            type: 'Ti.UI.Label',
-                            bindId: 'length',
-                            properties: {
-                                font: {
-                                    fontSize: ws.fonts.fontStyles.details.fontSize,
-                                    fontFamily: ws.fonts.fontStyles.details.fontFamily
-                                },
-                                color: ws.fonts.fontStyles.details.fontColor,
-                                top: 5,
-                                left: 5,
-                                width: Ti.UI.SIZE,
-                                height: Ti.UI.SIZE
-                            }
-                        }],
+                        type: 'Ti.UI.Label',
+                        bindId: 'length',
+                        properties: {
+                            font: {
+                                fontSize: ws.fonts.fontStyles.details.fontSize,
+                                fontFamily: ws.fonts.fontStyles.details.fontFamily
+                            },
+                            color: ws.fonts.fontStyles.details.fontColor,
+                            top: 5,
+                            left: 5,
+                            width: Ti.UI.SIZE,
+                            height: Ti.UI.SIZE
+                        }
                     },
                     // Constructed Label
                     // -----------------------------------
                     {
-                        type: 'Ti.UI.View',
-                        properties: {                        
-                            top: 0,
-                            left: 0,
-                            width: Ti.UI.FILL,
-                            height: Ti.UI.SIZE,
-                            layout: 'horizontal'
-                        },
-                        childTemplates: [
-                        /*{
-                            type: 'Ti.UI.Label',
-                            properties: {
-                                font: {
-                                    fontSize: ws.fonts.fontStyles.details.fontSize,
-                                    fontFamily: ws.fonts.fontStyles.details.fontFamily,
-                                    fontWeight: 'bold'
-                                },
-                                color: ws.fonts.fontStyles.details.fontColor,
-                                top: 0,
-                                left: 0,
-                                text: ws.translations.translate('constructed'),
-                                width: Ti.UI.SIZE,
-                                height: Ti.UI.SIZE
-                            }
-                        },*/
-                        {
-                            type: 'Ti.UI.Label',
-                            bindId: 'constructed',
-                            properties: {
-                                font: {
-                                    fontSize: ws.fonts.fontStyles.details.fontSize,
-                                    fontFamily: ws.fonts.fontStyles.details.fontFamily
-                                },
-                                color: ws.fonts.fontStyles.details.fontColor,
-                                top: 5,
-                                left: 5,
-                                width: Ti.UI.SIZE,
-                                height: Ti.UI.SIZE
-                            }
-                        }],
-                    }]
+                        type: 'Ti.UI.Label',
+                        bindId: 'constructed',
+                        properties: {
+                            font: {
+                                fontSize: ws.fonts.fontStyles.details.fontSize,
+                                fontFamily: ws.fonts.fontStyles.details.fontFamily
+                            },
+                            color: ws.fonts.fontStyles.details.fontColor,
+                            top: 5,
+                            left: 5,
+                            width: Ti.UI.SIZE,
+                            height: Ti.UI.SIZE
+                        }
+                    }
+                    ]
                 },
                 {
                     type: 'Ti.UI.ImageView',
