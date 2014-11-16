@@ -164,9 +164,19 @@ ws.fonts.addFontStyle({
 });
 ws.fonts.addFontStyle({
     id: 'detailRiderTitle',
-    fontSize: 24,
+    fontSize: 20,
     fontColor: '#000',
     fontId: 'oSansExtraBold'
+});
+ws.fonts.addFontStyle({
+    id: 'detailRiderTeam',
+    fontSize: 16,
+    fontColor: '#444'
+});
+ws.fonts.addFontStyle({
+    id: 'detailRiderTown',
+    fontSize: 14,
+    fontColor: '#666'
 });
 ws.fonts.addFontStyle({
     id: 'detailTitle',
@@ -182,5 +192,10 @@ ws.fonts.addFontStyle({
     id: 'detailTrackDate',
     fontSize: 16,
     fontColor: '#fff'
+});
+ws.fonts.addFontStyle({
+    id: 'trophy',
+    fontSize: 16,
+    fontColor: '#000'
 });
 // -----------------------------------------
