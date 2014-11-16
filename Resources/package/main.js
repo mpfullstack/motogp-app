@@ -102,6 +102,16 @@ var mainMenuOptions = [
         text: ws.translations.translate('riders').toUpperCase(),
         id: "riders",
         imageUrl: '/images/riders.png'
+    },
+    {
+        text: ws.translations.translate('settings').toUpperCase(),
+        id: "settings",
+        imageUrl: '/images/settings.png'
+    },
+    {
+        text: ws.translations.translate('credits').toUpperCase(),
+        id: "credits",
+        imageUrl: '/images/credits.png'
     }
 ];
 

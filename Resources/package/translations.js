@@ -16,6 +16,24 @@ ws.translations.set("riders", {
     "en": "Riders"
 });
 
+ws.translations.set("settings", {
+    "ca": "Configuració",
+    "es": "Configuración",
+    "en": "Settings"
+});
+
+ws.translations.set("language", {
+    "ca": "Idioma",
+    "es": "Idioma",
+    "en": "Language"
+});
+
+ws.translations.set("credits", {
+    "ca": "Crèdits",
+    "es": "Créditos",
+    "en": "Credits"
+});
+
 ws.translations.set("date", {
     "ca": "Data",
     "es": "Fecha",
