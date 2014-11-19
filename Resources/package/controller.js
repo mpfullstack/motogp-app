@@ -205,12 +205,15 @@ ws.Controller = (function(){
                         this.trackDetailAction(params);
                         break;
                     case "settings":
-                        ws.topBar.mainButton.setTextProperty("font", {
-                            fontSize: ws.fonts.fontStyles.subMenu.fontSize                            
-                        });
                         ws.topBar.mainButton.setText(ws.translations.translate('settings').toUpperCase());
-                        ws.topBar.mainButton.setImage("/images/arrow_back.png");
-                        ws.topBar.mainButton.setImageSize(21);
+                        ws.topBar.mainButton.setTextProperty("font", {
+                            fontSize : ws.fonts.fontStyles.title.fontSize,
+                            fontFamily : ws.fonts.fontStyles.title.fontSize.fontFamily,
+                            fontWeight: 'bold',
+                            fontStyle: 'italic'                                                     
+                        });
+                        ws.topBar.mainButton.setImage("/images/menu.png");
+                        ws.topBar.mainButton.setImageSize(42); 
                         this.settingsAction(params);
                 }
             }
@@ -899,18 +902,17 @@ ws.Controller = (function(){
                 layout: 'vertical'
             });
             // Language option
+            // ------------------------------------------------------------------------------------------------
             settingsView.add(
                 Ti.UI.createView({
                     height: 50,
                     width: ws.platform.screenWidth(),
                     bubbleParent: false,
                     top: 0,
-                    left: 0,
-                    id: ws.translations.getLanguage()
+                    left: 0
                 })
             );
             settingsView.children[settingsView.children.length-1].addEventListener('singletap', function(e){
-                // Ti.API.info("singletap in language option. Current Language Id: " + e.source.id);         
                 ws.mainAppView.add(
                     Ti.UI.createView({
                         width: ws.platform.screenWidth(),
@@ -919,24 +921,52 @@ ws.Controller = (function(){
                         left: 0,
                         zIndex: 100,
                         opacity: 0,
-                        backgroundColor: '#000',
+                        backgroundColor: '#000'                                 
+                    })
+                );
+                ws.mainAppView.add(
+                    Ti.UI.createView({
+                        width: ws.platform.screenWidth(),
+                        height: Ti.UI.FILL,
+                        top: 0,
+                        left: 0,
+                        zIndex: 101,
+                        opacity: 0,
+                        backgroundColor: 'transparent',
                         layout: 'vertical'                                      
                     })
                 );
                 var languages = ws.translations.getLanguages();
                 var top = 80;
+                ws.mainAppView.children[ws.mainAppView.children.length-1].add(
+                    Ti.UI.createLabel({
+                        width: '60%',
+                        height: 40,
+                        left: '20%',
+                        top: top,
+                        verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+                        backgroundColor: '#666',
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.regular.fontSize,
+                            fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                        },
+                        color: '#fff',
+                        text: ws.translations.translate('language').toUpperCase()
+                    })
+                );
+                top = 0;
                 for( var i=0; i<languages.length; i++ ) {
-                    //Ti.API.info("Creationg item language: " + languages[i] + " source.id " + e.source.id);
-                    if( i >= 1 )
-                        ws.mainAppView.children[ws.mainAppView.children.length-1].add(
-                            Ti.UI.createView({
-                                width: '60%',
-                                height: 1,
-                                left: '20%',
-                                top: 0,
-                                backgroundColor: '#333'
-                            })
-                        );
+                    ws.mainAppView.children[ws.mainAppView.children.length-1].add(
+                        Ti.UI.createView({
+                            width: '60%',
+                            height: 1,
+                            left: '20%',
+                            top: 0,
+                            backgroundColor: '#999'
+                        })
+                    );
                     ws.mainAppView.children[ws.mainAppView.children.length-1].add(
                         Ti.UI.createLabel({
                             width: '60%',
@@ -947,27 +977,30 @@ ws.Controller = (function(){
                             textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
                             backgroundColor: '#eee',
                             font: {
-                                fontWeight: (e.source.id==languages[i]?'bold':''),
+                                fontWeight: (ws.translations.getLanguage()==languages[i]?'bold':''),
                                 fontSize: ws.fonts.fontStyles.regular.fontSize,
                                 fontFamily: ws.fonts.fontStyles.regular.fontFamily
                             },
-                            color: (e.source.id==languages[i]?'#000':'#333'),
+                            color: (ws.translations.getLanguage()==languages[i]?'#000':'#333'),
                             text: languages[i].toUpperCase(),
                             id: languages[i]
                         })
-                    );
-                    top = 0;
+                    );                    
                 }
                 ws.mainAppView.children[ws.mainAppView.children.length-1].addEventListener('singletap', function(e){
                     var language = e.source.id;
-                    if( language != ws.translations.getLanguage() ) {
+                    if( language && language != ws.translations.getLanguage() ) {
                         ws.translations.setLanguage(language);
                         ws.controller.reload('settings');
-                    }  else {
+                    } else {
                         ws.mainAppView.remove(ws.mainAppView.children[ws.mainAppView.children.length-1]);
+                        ws.mainAppView.children[ws.mainAppView.children.length-1] = null;
+                        ws.mainAppView.remove(ws.mainAppView.children[ws.mainAppView.children.length-1]);
+                        ws.mainAppView.children[ws.mainAppView.children.length-1] = null;
                     }
                 });
-                ws.mainAppView.children[ws.mainAppView.children.length-1].setOpacity(0.8);                    
+                ws.mainAppView.children[ws.mainAppView.children.length-2].setOpacity(0.8); 
+                ws.mainAppView.children[ws.mainAppView.children.length-1].setOpacity(1);                    
             });
             settingsView.children[settingsView.children.length-1].add(
                 Ti.UI.createLabel({
@@ -999,7 +1032,182 @@ ws.Controller = (function(){
                     color: ws.fonts.fontStyles.regular.fontColor,
                     id: ws.translations.getLanguage()
                 })
-            );            
+            );   
+            // END Language option
+            // ------------------------------------------------------------------------------------------------
+            
+            settingsView.add(
+                Ti.UI.createView({
+                    height: 1,
+                    width: ws.platform.screenWidth(),
+                    top: 0,
+                    left: 0,
+                    backgroundColor: '#999'
+                })
+            );  
+            
+            // Analytics option
+            // ------------------------------------------------------------------------------------------------
+            settingsView.add(
+                Ti.UI.createView({
+                    height: 50,
+                    width: ws.platform.screenWidth(),
+                    bubbleParent: false,
+                    top: 0,
+                    left: 0
+                })
+            );
+            settingsView.children[settingsView.children.length-1].addEventListener('singletap', function(e){
+                // Ti.API.info("singletap in language option. Current Language Id: " + e.source.id);         
+                ws.mainAppView.add(
+                    Ti.UI.createView({
+                        width: ws.platform.screenWidth(),
+                        height: Ti.UI.FILL,
+                        top: 0,
+                        left: 0,
+                        zIndex: 100,
+                        opacity: 0,
+                        backgroundColor: '#000'                                 
+                    })
+                );
+                ws.mainAppView.add(
+                    Ti.UI.createView({
+                        width: ws.platform.screenWidth(),
+                        height: Ti.UI.FILL,
+                        top: 0,
+                        left: 0,
+                        zIndex: 101,
+                        opacity: 0,
+                        backgroundColor: 'transparent',
+                        layout: 'vertical'                                      
+                    })
+                );
+                var options = ['enabled','disabled'];
+                var top = 80;
+                ws.mainAppView.children[ws.mainAppView.children.length-1].add(
+                    Ti.UI.createLabel({
+                        width: '80%',
+                        height: 40,
+                        left: '10%',
+                        top: top,
+                        verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+                        backgroundColor: '#666',
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.regular.fontSize,
+                            fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                        },
+                        color: '#fff',
+                        text: ws.translations.translate('analytics').toUpperCase()
+                    })
+                );
+                top = 0;
+                ws.mainAppView.children[ws.mainAppView.children.length-1].add(
+                    Ti.UI.createLabel({
+                        width: '80%',
+                        height: Ti.UI.SIZE,
+                        left: '10%',
+                        top: top,
+                        verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+                        backgroundColor: '#666',
+                        font: {
+                            fontSize: ws.fonts.fontStyles.details.fontSize,
+                            fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                        },
+                        color: '#eee',
+                        text: ws.translations.translate('analytics_info')
+                    })
+                );
+                ws.mainAppView.children[ws.mainAppView.children.length-1].add(
+                    Ti.UI.createView({
+                        width: '80%',
+                        height: 14,
+                        left: '10%',
+                        top: top,
+                        backgroundColor: '#666'
+                    })
+                );
+                for( var i=0; i<options.length; i++ ) {                    
+                    ws.mainAppView.children[ws.mainAppView.children.length-1].add(
+                        Ti.UI.createView({
+                            width: '80%',
+                            height: 1,
+                            left: '10%',
+                            top: 0,
+                            backgroundColor: '#333'
+                        })
+                    );
+                    ws.mainAppView.children[ws.mainAppView.children.length-1].add(
+                        Ti.UI.createLabel({
+                            width: '80%',
+                            height: 40,
+                            left: '10%',
+                            top: top,
+                            verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+                            textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+                            backgroundColor: '#eee',
+                            font: {
+                                fontWeight: (ws.settings.get(ws.settings.properties.analytics)==options[i]?'bold':''),
+                                fontSize: ws.fonts.fontStyles.regular.fontSize,
+                                fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                            },
+                            color: (ws.settings.get(ws.settings.properties.analytics)==options[i]?'#000':'#333'),
+                            text: ws.translations.translate(options[i]).toUpperCase(),
+                            id: options[i]
+                        })
+                    );
+                }
+                ws.mainAppView.children[ws.mainAppView.children.length-1].addEventListener('singletap', function(e){
+                    var option = e.source.id;
+                    if( option && option != ws.settings.get(ws.settings.properties.analytics) ) {
+                        ws.settings.set(ws.settings.properties.analytics, option);
+                        settingsView.children[settingsView.children.length-1].children[
+                            settingsView.children[settingsView.children.length-1].children.length-1
+                        ].setText(
+                            ws.translations.translate(ws.settings.get(ws.settings.properties.analytics)).toUpperCase()
+                        );                        
+                    }
+                    ws.mainAppView.remove(ws.mainAppView.children[ws.mainAppView.children.length-1]);
+                    ws.mainAppView.children[ws.mainAppView.children.length-1] = null;
+                    ws.mainAppView.remove(ws.mainAppView.children[ws.mainAppView.children.length-1]);
+                    ws.mainAppView.children[ws.mainAppView.children.length-1] = null;
+                });
+                ws.mainAppView.children[ws.mainAppView.children.length-2].setOpacity(0.8); 
+                ws.mainAppView.children[ws.mainAppView.children.length-1].setOpacity(1);                                  
+            });        
+            settingsView.children[settingsView.children.length-1].add(
+                Ti.UI.createLabel({
+                    text: ws.translations.translate("analytics").toUpperCase(),
+                    height: Ti.UI.SIZE,
+                    width: Ti.UI.SIZE,
+                    verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+                    left: 7,     
+                    font: {
+                        fontSize: ws.fonts.fontStyles.regular.fontSize,
+                        fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                    },
+                    color: ws.fonts.fontStyles.regular.fontColor
+                })
+            );
+            settingsView.children[settingsView.children.length-1].add(
+                Ti.UI.createLabel({
+                    text: ws.translations.translate(ws.settings.get(ws.settings.properties.analytics)).toUpperCase(),
+                    height: Ti.UI.SIZE,
+                    width: Ti.UI.SIZE,
+                    verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+                    right: 10,     
+                    font: {
+                        fontWeight: 'bold',
+                        fontSize: ws.fonts.fontStyles.regular.fontSize,
+                        fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                    },
+                    color: ws.fonts.fontStyles.regular.fontColor
+                })
+            );
+            // END Analytics option
+            // ------------------------------------------------------------------------------------------------
             ws.mainAppView.add( settingsView );
             this.actionEnd();
         },

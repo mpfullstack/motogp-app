@@ -9,12 +9,19 @@ ws.translations = new ws.Translations({
 
 // Include App files
 // -----------------------------------------
+Ti.include('settings.js');
 Ti.include('translations.js');
 Ti.include('fonts.js');
 Ti.include('model.js');
 Ti.include('template.js');
 Ti.include('controller.js');
 // -----------------------------------------
+
+// -----------------------------------------
+// Main App Settings
+// -----------------------------------------
+
+ws.settings = new ws.Settings();
 
 // -----------------------------------------
 // Main UI App
