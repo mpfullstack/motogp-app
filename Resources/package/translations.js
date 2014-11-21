@@ -1,3 +1,9 @@
+ws.translations.set("default", {
+    "ca": "MotoGP",
+    "es": "MotoGP",
+    "en": "MotoGP"
+});
+
 ws.translations.set("tracks", {
     "ca": "Circuits",
     "es": "Circuitos",

@@ -142,7 +142,7 @@ ws.Controller = (function(){
                 this.pushStackTrace(name);
                 switch(name) {
                     case "default":
-                        ws.topBar.mainButton.setText("MotoGP");
+                        ws.topBar.mainButton.setText(ws.translations.translate('default').toUpperCase()); 
                         this.defaultAction();
                         break;
                         
@@ -222,6 +222,13 @@ ws.Controller = (function(){
         // Default action
         // ------------------------------------------------------------------------------------
         defaultAction: function() {
+            ws.mainAppView.add(
+                Ti.UI.createView({
+                    width: ws.platform.screenWidth(),
+                    height: Ti.UI.FILL,
+                    backgroundColor: '#fff'
+                })
+            );
             this.actionEnd();
         },
         
@@ -648,14 +655,24 @@ ws.Controller = (function(){
                     top: 0,
                     left: 0,
                     width: ws.platform.screenWidth(),                                
-                    height: Ti.UI.SIZE,
+                    height: 65,
                     backgroundColor: '#000',
-                    layout: 'vertical',
-                    opacity: 0.75,
+                    opacity: 0.8,
                     zIndex: 4
                 })
             );
-            mainTrackDetailView.children[0].add(
+            mainTrackDetailView.add(
+                Ti.UI.createView({
+                    top: 0,
+                    left: 0,
+                    width: ws.platform.screenWidth(),                                
+                    height: Ti.UI.SIZE,
+                    backgroundColor: 'transparent',
+                    layout: 'vertical',                    
+                    zIndex: 5
+                })
+            );
+            mainTrackDetailView.children[1].add(
                 Ti.UI.createLabel({
                     text: track.name.toUpperCase(),
                     height: Ti.UI.SIZE,
@@ -671,7 +688,7 @@ ws.Controller = (function(){
                     // verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
                 })
             );
-            mainTrackDetailView.children[0].add(
+            mainTrackDetailView.children[1].add(
                 Ti.UI.createLabel({
                     text: track.textDate + (track.tv?" - " + track.tv:""),
                     height: Ti.UI.SIZE,
@@ -685,14 +702,14 @@ ws.Controller = (function(){
                     color: ws.fonts.fontStyles.detailTrackDate.fontColor
                 })
             );          
-            mainTrackDetailView.children[0].add(
+            /*mainTrackDetailView.children[1].add(
                 Ti.UI.createView({
                     top: 0,
                     left: 0,
                     width: ws.platform.screenWidth(),
                     height: 4
                 })
-            );
+            );*/
             mainTrackDetailView.add(
                 Ti.UI.createScrollView({
                     top: 0,
@@ -708,7 +725,7 @@ ws.Controller = (function(){
                     // opacity: 0
                 })
             );  
-            mainTrackDetailView.children[1].add(
+            mainTrackDetailView.children[2].add(
                 Ti.UI.createImageView({
                     image: track.image,
                     top: 70,
@@ -881,7 +898,7 @@ ws.Controller = (function(){
                     );
                 }
             }
-            mainTrackDetailView.children[1].add( contentView );                   
+            mainTrackDetailView.children[2].add( contentView );                   
             ws.mainAppView.add( mainTrackDetailView );
             this.actionEnd();
         },

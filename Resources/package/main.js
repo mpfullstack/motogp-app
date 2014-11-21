@@ -47,7 +47,7 @@ ws.topBar = new ws.menu.TopBar({
     bgColor: '#eee',
     mainButton: new ws.ui.Button({
         imageUrl : '../images/menu.png',
-        text: 'MotoGP',
+        text: ws.translations.translate('default').toUpperCase(),
         color: '#b00d35',
         font: {
             fontSize : ws.fonts.fontStyles.title.fontSize,
@@ -95,6 +95,11 @@ var onClickMainMenuOption = function(obj) {
 }
 
 var mainMenuOptions = [
+    {
+        text: ws.translations.translate('default').toUpperCase(),
+        id: "default",
+        imageUrl: '/images/home.png'
+    },
     {
         text: ws.translations.translate('tracks').toUpperCase(),
         id: "tracks",
