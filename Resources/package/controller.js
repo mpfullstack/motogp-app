@@ -27,11 +27,11 @@ ws.Controller = (function(){
         // ------------------------------------------------------------------------------------
         reload: function(action) {
             this.state = 'initial';
-            this.stackTrace = ['default'];
+            this.stackTrace = [];
             this.currentAction = '';            
             this.emptyMainAppView();
             ws.mainMenu.reload();
-            this.action(action);           
+            this.action(action);          
         },
         
         // Template object
@@ -60,7 +60,7 @@ ws.Controller = (function(){
         
         // StackTrace App
         // ------------------------------------------------------------------------------------        
-        stackTrace: ['default'],
+        stackTrace: [],
         
         // Add action to stack trace
         // ------------------------------------------------------------------------------------        
@@ -86,7 +86,7 @@ ws.Controller = (function(){
         
         // Current Action
         // ------------------------------------------------------------------------------------
-        currentAcion: 'default',
+        currentAction: '',
         
         // Action Back
         // ------------------------------------------------------------------------------------
@@ -136,7 +136,8 @@ ws.Controller = (function(){
         // ------------------------------------------------------------------------------------
         action: function(name, params) {
             if( name !== this.currentAction ) {
-                ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});
+                if( this.currentAction != '' )
+                    ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});
                 this.emptyMainAppView();
                 this.currentAction = name;
                 this.pushStackTrace(name);
@@ -222,14 +223,349 @@ ws.Controller = (function(){
         // Default action
         // ------------------------------------------------------------------------------------
         defaultAction: function() {
-            ws.mainAppView.add(
-                Ti.UI.createView({
+            var context = this;
+            var onDataReady = function(track) {
+                var homeContainerView = Ti.UI.createView({
                     width: ws.platform.screenWidth(),
                     height: Ti.UI.FILL,
-                    backgroundColor: '#fff'
+                    bubbleParent: false,
+                    backgroundImage: '/images/bg-jerez.png',
+                    id: 'home',
+                    opacity: 0,
+                    top: 0,
+                    zIndex: 3
+                });
+                ws.mainAppView.add(homeContainerView);
+                // Adding Header container
+                homeContainerView.add(
+                    Ti.UI.createView({
+                        width: ws.platform.screenWidth(),
+                        height: 67,
+                        backgroundColor: '#fff',
+                        top: 0,
+                        opacity: 0.8
+                    })
+                );
+                homeContainerView.add(
+                    Ti.UI.createView({
+                        width: ws.platform.screenWidth(),
+                        height: 67,
+                        backgroundColor: 'transparent',
+                        layout: 'vertical',         
+                        top: 0
+                    })
+                );
+                // Adding Header title
+                homeContainerView.children[1].add(
+                    Ti.UI.createLabel({
+                        text: track.name,
+                        height: Ti.UI.SIZE,
+                        left: 10,
+                        top: 0,      
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.homeTrackTitle.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeTrackTitle.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeTrackTitle.fontColor
+                    })
+                );
+                // Adding Header sub title (date and tv)
+                homeContainerView.children[1].add(
+                    Ti.UI.createLabel({
+                        text: track.textDate[ws.translations.getLanguage()] + (track.tv[ws.translations.getLanguage()]?" - " + track.tv[ws.translations.getLanguage()]:""),
+                        height: Ti.UI.SIZE,
+                        left: 10,
+                        top: 0,      
+                        font: {
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            fontFamily: ws.fonts.fontStyles.detailTrackDate.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeTrackTitle.fontColor
+                    })
+                );
+                
+                // Adding content homeView
+                var homeView = Ti.UI.createView({
+                    width: ws.platform.screenWidth(),
+                    height: Ti.UI.FILL,                                                
+                    top: 73,
+                    layout: 'vertical'
                 })
-            );
-            this.actionEnd();
+                homeContainerView.add(homeView);
+                // Addding countdown
+                homeView.add(
+                    Ti.UI.createLabel({
+                        text: ws.translations.translate('coming_in'),
+                        height: Ti.UI.SIZE,
+                        width: ws.platform.screenWidth(),
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+                        top: 0,      
+                        font: {
+                            fontSize: 16,
+                            fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                        },
+                        shadowColor: '#000',
+                        shadowOffset: {x:2, y:2},
+                        shadowRadius: 3,
+                        color: '#fff'
+                    })
+                );
+                homeView.add(
+                    Ti.UI.createLabel({
+                        text: "",
+                        height: Ti.UI.SIZE,
+                        width: ws.platform.screenWidth(),
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+                        top: 2,      
+                        font: {
+                            fontSize: 30,
+                            fontFamily: ws.fonts.fontStyles.regular.fontFamily
+                        },
+                        shadowColor: '#000',
+                        shadowOffset: {x:2, y:2},
+                        shadowRadius: 3,
+                        color: '#fff'
+                    })
+                );
+                // Get left seconds to start date time race
+                now = new Date();
+                // Ti.API.info("start Date " + track.startDate);
+                var startDate = ws.utils.newDateAsUTC(new Date(Date.parse(track.startDate)));
+                // Ti.API.info("now : " + now);
+                // Ti.API.info("startDate : " + startDate);
+                var leftSeconds = parseInt(Number(startDate.getTime() - now.getTime()) / 1000);
+                var countdown = new ws.utils.CountDown({
+                    seconds: leftSeconds, 
+                    tick: function(context) {
+                        if(
+                            ws.mainAppView.children.length
+                            &&
+                            ws.mainAppView.children[0].id == 'home' 
+                        ) {
+                            homeView.children[1].setText(
+                                context.time.d + "d " + context.time.h + "h " + context.time.m + "m " + context.time.s + "s"
+                            );
+                        } else {
+                            countdown.stop();
+                            countdown = null;
+                        }
+                    },
+                    end: function() {
+                        
+                    }
+                });                
+                countdown.start();
+                
+                // Track image
+                homeView.add(
+                    Ti.UI.createImageView({
+                        image: track.image,
+                        top: -20,
+                        left: '15%',
+                        width: '70%'
+                    })
+                );
+                
+                // Add detail view container
+                homeView.add(
+                    Ti.UI.createView({
+                        width: ws.platform.screenWidth(),
+                        left: 0,
+                        height: Ti.UI.FILL,
+                        layout: 'vertical',
+                        top: -15,
+                        backgroundColor: '#333'
+                    })
+                );
+                
+                var labelWidth = '35%';
+                
+                // Fastest lap label
+                homeView.children[homeView.children.length-1].add(
+                    Ti.UI.createView({
+                        // width: '80%',
+                        left: 10,
+                        height: Ti.UI.SIZE,
+                        layout: 'horizontal',
+                        top: 13
+                        // backgroundColor: '#444'
+                    })
+                );                
+                homeView.children[homeView.children.length-1].children[
+                    homeView.children[homeView.children.length-1].children.length - 1
+                ].add(
+                    Ti.UI.createLabel({
+                        text: ws.translations.translate('fastest_lap'),
+                        width: labelWidth,//Ti.UI.SIZE,
+                        left: 0,
+                        top: 0,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.homeDetails.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeDetails.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeDetails.fontColor
+                    })
+                );
+                // Fastest lap value
+                homeView.children[homeView.children.length-1].children[
+                    homeView.children[homeView.children.length-1].children.length - 1
+                ].add(
+                    Ti.UI.createLabel({
+                        text: track.fastest_lap,
+                        width: Ti.UI.SIZE,
+                        left: 0,
+                        top: 0,      
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                        font: {                            
+                            fontSize: ws.fonts.fontStyles.homeDetails.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeDetails.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeDetails.fontColor
+                    })
+                );
+                
+                // Length track label
+                homeView.children[homeView.children.length-1].add(
+                    Ti.UI.createView({
+                        // width: '80%',
+                        left: 10,
+                        height: Ti.UI.SIZE,
+                        layout: 'horizontal',
+                        top: 2
+                        // backgroundColor: '#444'
+                    })
+                );
+                homeView.children[homeView.children.length-1].children[
+                    homeView.children[homeView.children.length-1].children.length - 1
+                ].add(
+                    Ti.UI.createLabel({
+                        text: ws.translations.translate('length'),
+                        width: labelWidth,//Ti.UI.SIZE,
+                        left: 0,
+                        top: 0,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.homeDetails.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeDetails.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeDetails.fontColor
+                    })
+                );
+                // Length track value
+                homeView.children[homeView.children.length-1].children[
+                    homeView.children[homeView.children.length-1].children.length - 1
+                ].add(
+                    Ti.UI.createLabel({
+                        text: track.length + " m",
+                        width: Ti.UI.SIZE,
+                        left: 0,
+                        top: 0,      
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                        font: {
+                            fontSize: ws.fonts.fontStyles.homeDetails.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeDetails.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeDetails.fontColor
+                    })
+                );
+                
+                // Laps track label
+                homeView.children[homeView.children.length-1].add(
+                    Ti.UI.createView({
+                        // width: '80%',
+                        left: 10,
+                        height: Ti.UI.SIZE,
+                        layout: 'horizontal',
+                        top: 2
+                        // backgroundColor: '#444'
+                    })
+                );
+                homeView.children[homeView.children.length-1].children[
+                    homeView.children[homeView.children.length-1].children.length - 1
+                ].add(
+                    Ti.UI.createLabel({
+                        text: ws.translations.translate('laps'),
+                        width: labelWidth,//Ti.UI.SIZE,
+                        left: 0,
+                        top: 0,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.homeDetails.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeDetails.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeDetails.fontColor
+                    })
+                );
+                // Laps track value
+                homeView.children[homeView.children.length-1].children[
+                    homeView.children[homeView.children.length-1].children.length - 1
+                ].add(
+                    Ti.UI.createLabel({
+                        text: track.laps,
+                        width: Ti.UI.SIZE,
+                        left: 0,
+                        top: 0,      
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                        font: {
+                            fontSize: ws.fonts.fontStyles.homeDetails.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeDetails.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeDetails.fontColor
+                    })
+                );
+                
+                // Constructed label
+                homeView.children[homeView.children.length-1].add(
+                    Ti.UI.createView({
+                        // width: '80%',
+                        left: 10,
+                        height: Ti.UI.SIZE,
+                        layout: 'horizontal',
+                        top: 2
+                        // backgroundColor: '#444'
+                    })
+                );
+                homeView.children[homeView.children.length-1].children[
+                    homeView.children[homeView.children.length-1].children.length - 1
+                ].add(
+                    Ti.UI.createLabel({
+                        text: ws.translations.translate('constructed'),
+                        width: labelWidth,//Ti.UI.SIZE,
+                        left: 0,
+                        top: 0,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.homeDetails.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeDetails.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeDetails.fontColor
+                    })
+                );
+                // Constructed value
+                homeView.children[homeView.children.length-1].children[
+                    homeView.children[homeView.children.length-1].children.length - 1
+                ].add(
+                    Ti.UI.createLabel({
+                        text: track.constructed,
+                        width: Ti.UI.SIZE,
+                        left: 0,
+                        top: 0,      
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                        font: {
+                            fontSize: ws.fonts.fontStyles.homeDetails.fontSize,
+                            fontFamily: ws.fonts.fontStyles.homeDetails.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.homeDetails.fontColor
+                    })
+                );
+                                
+                context.actionEnd();  
+            }            
+            // Get next Track            
+            this.model.getNextTrack(onDataReady);
         },
         
         // Tracks action
@@ -238,12 +574,12 @@ ws.Controller = (function(){
             var context = this;
             var onDataReady = function(tracks) {                
                 var data = [];
-                var time = new Date().getTime();
+                // var time = new Date().getTime();
                 for (var i = 0; i < tracks.ids.length; i++) {
                     var trackId = tracks.ids[i];
                     var track = tracks.tracks[trackId];
                     var done = false;
-                    if( track.date && new Date() > new Date(track.date) )
+                    if( track.startDate && new Date() > ws.utils.newDateAsUTC(new Date(Date.parse(track.startDate))) )
                         done = true;
                     data.push({
                         name: {
@@ -253,10 +589,10 @@ ws.Controller = (function(){
                             image: track.smallImage
                         },
                         textDate: {
-                            text: track.textDate
+                            text: track.textDate[ws.translations.getLanguage()]
                         },
                         tv: {
-                            text: track.tv
+                            text: track.tv[ws.translations.getLanguage()]
                         },
                         length: {
                             text: track.length + " m"
@@ -271,8 +607,8 @@ ws.Controller = (function(){
                         }
                     });
                 }
-                var time2 = new Date().getTime();
-                Ti.API.info("Time loading items: " + ws.utils.toSec(time2-time));
+                // var time2 = new Date().getTime();
+                // Ti.API.info("Time loading items: " + ws.utils.toSec(time2-time));
                 
                 // ListView            
                 ws.mainAppView.add(
@@ -647,7 +983,7 @@ ws.Controller = (function(){
                 height: Ti.UI.SIZE,
                 bubbleParent: false,
                 backgroundColor: '#fff',
-                backgroundImage: '/images/bg-aragon.png',
+                backgroundImage: '/images/bg-jerez.png',
                 opacity: 0
             });
             mainTrackDetailView.add(
@@ -690,7 +1026,7 @@ ws.Controller = (function(){
             );
             mainTrackDetailView.children[1].add(
                 Ti.UI.createLabel({
-                    text: track.textDate + (track.tv?" - " + track.tv:""),
+                    text: track.textDate[ws.translations.getLanguage()] + (track.tv[ws.translations.getLanguage()]?" - " + track.tv[ws.translations.getLanguage()]:""),
                     height: Ti.UI.SIZE,
                     left: '2%',    
                     top: 1,      
@@ -728,9 +1064,9 @@ ws.Controller = (function(){
             mainTrackDetailView.children[2].add(
                 Ti.UI.createImageView({
                     image: track.image,
-                    top: 70,
-                    left: '5%',
-                    width: '90%'
+                    top: 50,
+                    left: '12%',
+                    width: '76%'
                 })
             );
             var menuView = Ti.UI.createView({
@@ -802,7 +1138,7 @@ ws.Controller = (function(){
                 height: Ti.UI.SIZE,
                 left: 0,
                 width: ws.platform.screenWidth(),
-                top: 10,
+                top: -5,
                 zIndex: 1,
                 backgroundColor: '#fff'
             });

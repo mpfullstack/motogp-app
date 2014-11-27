@@ -14,7 +14,9 @@ Ti.include("package/main.js");
 
 // Main App Controller
 ws.controller = new ws.Controller();
-//ws.controller.action("default");
+
+// Default Action
+ws.controller.action("default");
 
 // Start App
 ws.mainWindow.open();

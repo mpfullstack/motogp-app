@@ -118,6 +118,8 @@ ws.Model = (function(){
         getRiders: function(callback) {
             var newDataAvailable = false;
             Ti.API.info("getRiders()")
+            Ti.API.info(new Date(Date.parse("lastIndex.ridersLastUpdate time " + this.lastIndex.ridersLastUpdate)));
+            Ti.API.info(new Date(Date.parse("lastIndex.ridersLastUpdate to UTC " + this.lastIndex.ridersLastUpdate)).toUTCString());
             if( this.lastIndex && this.index && Date.parse(this.lastIndex.ridersLastUpdate) > Date.parse(this.index.ridersLastUpdate) ) {
                 // Ti.API.info("Last index: " + Date.parse(this.lastIndex.ridersLastUpdate));
                 // Ti.API.info("Current index: " + Date.parse(this.index.ridersLastUpdate));
@@ -158,13 +160,14 @@ ws.Model = (function(){
             // Function to sort tracks by date ascending being first 
             // the ones pending and after the ones already done.
             var sortTracks = function(tracksData) {
+                Ti.API.info("sortTracks");
                 var trackIds = tracksData.ids;
                 var doneTrackIds = [];
                 var pendingTrackIds = [];
                 for( var i=0; i<trackIds.length; i++ ) {
                     var track = tracksData.tracks[trackIds[i]];
                     track = formatTimeTableData(track);
-                    if( new Date() > new Date(track.date) ) {
+                    if( new Date() > ws.utils.newDateAsUTC(new Date(Date.parse(track.startDate))) ) {
                         doneTrackIds.push(trackIds[i]);
                     } else {
                         pendingTrackIds.push(trackIds[i]);
@@ -228,7 +231,19 @@ ws.Model = (function(){
         // ------------------------------------------------------------------------------------
         getTrack: function(id) {
             return _tracksData.tracks[id];
-        }
+        },
+        
+        // Get next track
+        // ------------------------------------------------------------------------------------
+        getNextTrack: function(callback) {
+            Ti.API.info("getNextTrack()");
+            var context = this;
+            var onGetTracksReady = function(tracksData){
+                var id = tracksData.ids[0];
+                callback(context.getTrack(id));
+            }
+            this.getTracks(onGetTracksReady);            
+        },
     };
     
     return Model;

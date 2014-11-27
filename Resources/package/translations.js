@@ -70,10 +70,16 @@ ws.translations.set("length", {
     "en": "Length"
 });
 
+ws.translations.set("laps", {
+    "ca": "Voltes",
+    "es": "Vueltas",
+    "en": "Laps"
+});
+
 ws.translations.set("constructed", {
-    "ca": "Construit al",
-    "es": "Construido el",
-    "en": "Constructed in"
+    "ca": "Construit",
+    "es": "Construido",
+    "en": "Constructed"
 });
 
 ws.translations.set("description", {
@@ -92,4 +98,16 @@ ws.translations.set("analytics_info", {
     "ca": "Aquesta opció permet a l'aplicació enviar dades estadístiques per fer un seguiment de l'ús d'aquesta.",
     "es": "Esta opción permite a la aplicación enviar datos estadísticos para hacer un seguimiento del uso de ésta.",
     "en": "This option lets the App send statistics data to track the use of the App itself."
+});
+
+ws.translations.set("coming_in", {
+    "ca": "Falten",
+    "es": "Faltan",
+    "en": "Starting in"
+});
+
+ws.translations.set("fastest_lap", {
+    "ca": "Volta ràpida",
+    "es": "Vuelta rápida",
+    "en": "Fastest lap"
 });

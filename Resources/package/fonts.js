@@ -153,6 +153,11 @@ ws.fonts.addFontStyle({
     fontColor: '#eee'
 });
 ws.fonts.addFontStyle({
+    id: 'homeDetails',
+    fontSize: 15,
+    fontColor: '#fff'
+});
+ws.fonts.addFontStyle({
     id: 'town',    
     fontSize: 12,
     fontColor: '#999'
@@ -197,5 +202,12 @@ ws.fonts.addFontStyle({
     id: 'trophy',
     fontSize: 16,
     fontColor: '#000'
+});
+
+ws.fonts.addFontStyle({
+    id: 'homeTrackTitle',
+    fontSize: 30,
+    fontColor: '#333',
+    fontId: 'oSansExtraBold'
 });
 // -----------------------------------------
