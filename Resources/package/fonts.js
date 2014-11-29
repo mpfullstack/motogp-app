@@ -210,4 +210,10 @@ ws.fonts.addFontStyle({
     fontColor: '#333',
     fontId: 'oSansExtraBold'
 });
+
+ws.fonts.addFontStyle({
+    id: 'trackDetails',
+    fontSize: 13,
+    fontColor: '#fff'
+});
 // -----------------------------------------

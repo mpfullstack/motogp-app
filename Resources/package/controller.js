@@ -1048,14 +1048,6 @@ ws.Controller = (function(){
                     color: ws.fonts.fontStyles.detailTrackDate.fontColor
                 })
             );          
-            /*mainTrackDetailView.children[1].add(
-                Ti.UI.createView({
-                    top: 0,
-                    left: 0,
-                    width: ws.platform.screenWidth(),
-                    height: 4
-                })
-            );*/
             mainTrackDetailView.add(
                 Ti.UI.createScrollView({
                     top: 0,
@@ -1063,22 +1055,227 @@ ws.Controller = (function(){
                     zIndex: 3,
                     width: ws.platform.screenWidth(),
                     contentWidth: ws.platform.screenWidth(),                
-                    // height: ws.platform.screenHeight() - ws.topBar.height,
                     bubbleParent: false,
                     backgroundColor: 'transparent',
-                    // backgroundImage: '/images/bg-aragon.png',
-                    layout: 'vertical'
-                    // opacity: 0
+                    layout: 'vertical'                    
                 })
             );  
+            
+            // Add image and details view
             mainTrackDetailView.children[2].add(
+                Ti.UI.createView({
+                    width: ws.platform.screenWidth(),
+                    left: 0,
+                    top: 0,
+                    height: Ti.UI.SIZE
+                })                
+            );
+            var imageFactor = 0.7;
+            switch(track.position) {
+                case 'top-left': // Lemans, Brno
+                    var containerDetailsWidth = '57%';
+                    var containerDetailsLeft = '43%';
+                    // Calculate height of resulting track image and divide by two to positioning view 
+                    // in the center plus/minux x points top because of track image
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 57; 
+                    var leftImage = '5%';
+                    var topImage  = 24;
+                    break;
+                case 'top': // Montmelo
+                    var containerDetailsWidth = '55%';
+                    var containerDetailsLeft = '45%';
+                    // Calculate height of resulting track image and divide by two to positioning view 
+                    // in the center plus/minux x points top because of track image
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 70; 
+                    var leftImage = '5%';
+                    var topImage  = 30;
+                    break;
+                case 'top-right': // Argentina, Mugello, Assen, Sachsenring, Silverstone, Indianapolis
+                    var containerDetailsWidth = '55%';
+                    var containerDetailsLeft = 8;
+                    // Calculate height of resulting track image and divide by two to positioning view 
+                    // in the center plus/minux x points top because of track image
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 70; 
+                    var leftImage = '21%';
+                    if( track.qname == 'mugello' || track.qname == 'silverstone' || track.qname == 'indianapolis' )
+                        var topImage  = 26;
+                    else
+                        var topImage  = 13;
+                    break;
+                case 'left': // Austin, Misano
+                    var containerDetailsWidth = '55%';
+                    var containerDetailsLeft = '45%';
+                    // Calculate height of resulting track image and divide by two to positioning view 
+                    // in the center plus/minux x points top because of track image
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 45;                                                                 
+                    var leftImage = '-5%';
+                    var topImage  = 50;
+                    if( track.qname == 'misano' ) {
+                        leftImage = '2%';
+                        topImage = 44;
+                        containerDetailsTop += 5;
+                    }                    
+                    
+                    break;
+                case 'right': // Motorland, Jerez
+                    var containerDetailsWidth = '55%';
+                    var containerDetailsLeft = 8;
+                    // Calculate height of resulting track image and divide by two to positioning view 
+                    // in the center plus/minux x points top because of track image
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 70;
+                    var leftImage = '21%';
+                    var topImage  = 45;
+                    if( track.qname == 'jerez' ) {
+                        containerDetailsTop -= 40;
+                        leftImage = '36%';
+                        topImage = 45  
+                    } 
+                    break;
+                case 'bottom-left': // Motegui
+                    var containerDetailsWidth = '52%';
+                    var containerDetailsLeft = '48%';
+                    // Calculate height of resulting track image and divide by two to positioning view 
+                    // in the center plus/minux x points top because of track image
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 15; 
+                    var leftImage = '-5%';
+                    var topImage  = 55;
+                    break;
+                case 'bottom-right':
+                    var containerDetailsWidth = '45%';
+                    var containerDetailsLeft = 8;
+                    // Calculate height of resulting track image and divide by two to positioning view 
+                    // in the center plus/minux x points top because of track image
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) - 35; 
+                    var leftImage = '21%';
+                    var topImage  = 60;
+                    break;
+                // TODO: Make a special case for QATAR
+                default:
+                    var containerDetailsWidth = '55%';
+                    var containerDetailsLeft = '45%';
+                    // Calculate height of resulting track image and divide by two to positioning view 
+                    // in the center plus 50 points top cus of track image
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 )+ 50; 
+                    var leftImage = '15%';
+                    var topImage  = 50;
+                    break;
+            }       
+            // Adding track image     
+            mainTrackDetailView.children[2].children[0].add(
                 Ti.UI.createImageView({
                     image: track.image,
-                    top: 50,
-                    left: '12%',
-                    width: '76%'
+                    top: topImage,
+                    left: leftImage,
+                    width: '70%'
                 })
             );
+            // Adding container track details
+            mainTrackDetailView.children[2].children[0].add(
+                Ti.UI.createView({
+                    height: Ti.UI.SIZE,
+                    width: containerDetailsWidth,                    
+                    left: containerDetailsLeft,                    
+                    top: containerDetailsTop, 
+                    layout: 'vertical'
+                })  
+            );
+            // Adding fastest lap label
+            mainTrackDetailView.children[2].children[0].children[1].add(
+                 Ti.UI.createLabel({
+                    text: ws.translations.translate('fastest_lap'),
+                    height: Ti.UI.SIZE,
+                    width: Ti.UI.SIZE,
+                    textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                    left: 0,
+                    top: 0,    
+                    font: {
+                        fontSize: ws.fonts.fontStyles.trackDetails.fontSize,
+                        fontFamily: ws.fonts.fontStyles.details.fontFamily
+                    },
+                    shadowColor: '#000',
+                    shadowOffset: {x:2, y:2},
+                    shadowRadius: 3,
+                    color: ws.fonts.fontStyles.trackDetails.fontColor
+                })
+            );
+            // Adding fastest lap value
+            mainTrackDetailView.children[2].children[0].children[1].add(
+                 Ti.UI.createLabel({
+                    text: track.fastest_lap,
+                    height: Ti.UI.SIZE,
+                    width: Ti.UI.SIZE,
+                    textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                    left: 0,
+                    top: 1,    
+                    font: {
+                        fontWeight: 'bold',
+                        fontSize: ws.fonts.fontStyles.trackDetails.fontSize,
+                        fontFamily: ws.fonts.fontStyles.details.fontFamily
+                    },
+                    shadowColor: '#000',
+                    shadowOffset: {x:2, y:2},
+                    shadowRadius: 3,
+                    color: ws.fonts.fontStyles.trackDetails.fontColor
+                })
+            );
+            // Adding track length
+            mainTrackDetailView.children[2].children[0].children[1].add(
+                 Ti.UI.createLabel({
+                    text: track.length + " m",
+                    height: Ti.UI.SIZE,
+                    width: Ti.UI.SIZE,
+                    textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                    left: 0,
+                    top: 0,    
+                    font: {
+                        fontSize: ws.fonts.fontStyles.trackDetails.fontSize,
+                        fontFamily: ws.fonts.fontStyles.details.fontFamily
+                    },
+                    shadowColor: '#000',
+                    shadowOffset: {x:2, y:2},
+                    shadowRadius: 3,
+                    color: ws.fonts.fontStyles.trackDetails.fontColor
+                })
+            );
+            // Adding laps number
+            mainTrackDetailView.children[2].children[0].children[1].add(
+                 Ti.UI.createLabel({
+                    text: track.laps + " " + ws.translations.translate('laps').toLowerCase(),
+                    height: Ti.UI.SIZE,
+                    width: Ti.UI.SIZE,
+                    textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                    left: 0,
+                    top: 1,    
+                    font: {
+                        fontSize: ws.fonts.fontStyles.trackDetails.fontSize,
+                        fontFamily: ws.fonts.fontStyles.details.fontFamily
+                    },
+                    shadowColor: '#000',
+                    shadowOffset: {x:2, y:2},
+                    shadowRadius: 3,
+                    color: ws.fonts.fontStyles.trackDetails.fontColor
+                })
+            );
+            // Adding construced year
+            mainTrackDetailView.children[2].children[0].children[1].add(
+                 Ti.UI.createLabel({
+                    text: ws.translations.translate('constructed') + " " + track.constructed,
+                    height: Ti.UI.SIZE,
+                    width: Ti.UI.SIZE,
+                    textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                    left: 0,
+                    top: 1,    
+                    font: {
+                        fontSize: ws.fonts.fontStyles.trackDetails.fontSize,
+                        fontFamily: ws.fonts.fontStyles.details.fontFamily
+                    },
+                    shadowColor: '#000',
+                    shadowOffset: {x:2, y:2},
+                    shadowRadius: 3,
+                    color: ws.fonts.fontStyles.trackDetails.fontColor
+                })
+            );                
+            
             var menuView = Ti.UI.createView({
                 width: ws.platform.screenWidth(),
                 left: 0,
@@ -1148,7 +1345,7 @@ ws.Controller = (function(){
                 height: Ti.UI.SIZE,
                 left: 0,
                 width: ws.platform.screenWidth(),
-                top: -5,
+                top: 5,
                 zIndex: 1,
                 backgroundColor: '#fff'
             });
@@ -1187,7 +1384,7 @@ ws.Controller = (function(){
             });
             contentView.add(timeTableView);
             var topDate = 0;            
-            for( var d in track.timetable ) {                
+            for( var d in track.timetable[ws.translations.getLanguage()] ) {                
                 timeTableView.add(
                     Ti.UI.createLabel({
                         text: d,
@@ -1203,7 +1400,7 @@ ws.Controller = (function(){
                     })
                 );
                 topDate = 5;
-                var rows = track.timetable[d];
+                var rows = track.timetable[ws.translations.getLanguage()][d];
                 for( var i=0; i<rows.length; i++ ) {
                     var row = rows[i];
                     timeTableView.add(
@@ -1581,7 +1778,7 @@ ws.Controller = (function(){
             ws.animation.hideActivityIndicator();
             ws.mainAppView.getChildren()[0].animate({
                 opacity: 1,
-                duration: 250
+                duration: 50//250
             })
         }
         

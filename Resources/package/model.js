@@ -191,22 +191,25 @@ ws.Model = (function(){
             var formatTimeTableData = function(trackData) {
                 var data = {};
                 var key;
-                var timetable = trackData.timetable;
-                var rows = timetable.split("\n");
-                for( var i=0; i<rows.length; i++ ) {
-                    var row = rows[i];
-                    var columns = row.split("-");
-                    if( columns.length == 1 ) {
-                        key = columns[0];
-                        data[key] = [];
-                    } else {
-                        data[key].push({
-                            "session": columns[0],
-                            "time":    columns[1]
-                        });  
-                    }             
+                for( var language in trackData.timetable ) {
+                    data[language] = {};
+                    var timetable = String(trackData.timetable[language]);
+                    var rows = timetable.split("\n");
+                    for( var i=0; i<rows.length; i++ ) {
+                        var row = rows[i];
+                        var columns = row.split("-");
+                        if( columns.length == 1 ) {
+                            key = columns[0];
+                            data[language][key] = [];
+                        } else {
+                            data[language][key].push({
+                                "session": columns[0],
+                                "time":    columns[1]
+                            });  
+                        }             
+                    }
+                    trackData.timetable[language] = data[language];
                 }
-                trackData.timetable = data;
                 return trackData;
             }
             
