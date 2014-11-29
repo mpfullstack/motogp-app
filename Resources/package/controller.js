@@ -16,11 +16,17 @@ ws.Controller = (function(){
     Controller.prototype = {
         // Initialize
         // ------------------------------------------------------------------------------------
-        initialize: function(options) {
-            if( !this.template )
-                this.template = new ws.Template();
-            if( !this.model )
-                this.model = new ws.Model();
+        initialize: function(options) {            
+            var context = this;
+            context.startAction = options.startAction; 
+            if( !context.template )
+                context.template = new ws.Template();
+            // if( !this.model )
+            context.model = new ws.Model({
+                onDataReady: function(){
+                    context.action(context.startAction);
+                }
+            });
         },
         
         // Reset/Reload App
@@ -33,6 +39,10 @@ ws.Controller = (function(){
             ws.mainMenu.reload();
             this.action(action);          
         },
+        
+        // Start action name
+        // ------------------------------------------------------------------------------------
+        startAction: null,
         
         // Template object
         // ------------------------------------------------------------------------------------

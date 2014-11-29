@@ -13,10 +13,12 @@ ws.dependencies.include("translations");
 Ti.include("package/main.js");
 
 // Main App Controller
-ws.controller = new ws.Controller();
+ws.controller = new ws.Controller({
+    startAction: 'default'
+});
 
 // Default Action
-ws.controller.action("default");
+//ws.controller.action("default");
 
 // Start App
 ws.mainWindow.open();

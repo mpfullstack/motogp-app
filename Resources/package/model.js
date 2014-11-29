@@ -16,6 +16,8 @@ ws.Model = (function(){
     var Model = function(options){
         if( !options )
             options = {};
+        if( options.onDataReady )
+            this.onDataReady = options.onDataReady;
         this.initialize(options);
     };
         
@@ -29,6 +31,10 @@ ws.Model = (function(){
         // Minimum time between index updates (milliseconds)
         // ------------------------------------------------------------------------------------
         refreshTime: 1,//30000, // 5 minutes
+        
+        // Callback function to call when data model is ready on start up
+        // ------------------------------------------------------------------------------------
+        onDataReady: null,
         
         // Default host
         // ------------------------------------------------------------------------------------
@@ -65,6 +71,8 @@ ws.Model = (function(){
                     context.lastIndex = JSON.parse(this.responseText);
                     Ti.API.info("index: " + context.index.tracksLastUpdate);
                     Ti.API.info("lastIndex: " + context.lastIndex.tracksLastUpdate);
+                    if( context.onDataReady )
+                        context.onDataReady();
                 };
                 _xhr.onerror = function(){
                     Ti.API.info("Error getting index.json");
@@ -81,6 +89,8 @@ ws.Model = (function(){
                 var indexFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'data', 'index.json');
                 context.index = JSON.parse(indexFile.read().text);
                 context.lastIndex = context.index;
+                if( context.onDataReady )
+                    context.onDataReady();
             }
         },
         
