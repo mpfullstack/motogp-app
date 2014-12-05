@@ -23,6 +23,125 @@ ws.Template = (function(){
         // Templates
         // ------------------------------------------------------------------------------------
         templates: {
+            // Classification item list
+            "classificationList": {
+                properties: {
+                    height: 35,
+                    selectedBackgroundColor: '#bbb',
+                    layout: 'horizontal'
+                },
+                events: {
+                    // Bind event callbacks for bubbled events
+                    // Events caught here are fired by the subcomponent views of the ListItem
+                    click: function(e) {
+                        Ti.API.info("click item id: " +e.itemId);
+                        // ws.controller.action('riderDetail', e.itemId);
+                    }
+                },
+                childTemplates: [
+                {
+                   type: 'Ti.UI.Label',
+                    bindId: 'position',
+                    properties: {
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.position.fontSize,
+                            fontFamily: ws.fonts.fontStyles.position.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.position.fontColor,                       
+                        left: 0,
+                        width: 30,
+                        zIndex: 0,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+                        verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+                        height: 35
+                    } 
+                },
+                {
+                    type: 'Ti.UI.View',
+                    properties: {                        
+                        left: 4,
+                        width: '60%',
+                        height: 35,
+                        layout: 'horizontal'
+                    },
+                    childTemplates: [
+                    // Rider name
+                    // -----------------------------------
+                    {
+                        type: 'Ti.UI.Label',
+                        bindId: 'name',
+                        properties: {
+                            font: {
+                                fontSize: ws.fonts.fontStyles.classification.fontSize,
+                                fontFamily: ws.fonts.fontStyles.classification.fontFamily,
+                                fontWeight: 'bold'
+                            },
+                            color: ws.fonts.fontStyles.classification.fontColor,
+                            left: 0,
+                            width: Ti.UI.SIZE,
+                            textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                            verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,                      
+                            height: 35
+                        }
+                    },
+                    // Rider Team
+                    // -----------------------------------
+                    {
+                        type: 'Ti.UI.Label',
+                        bindId: 'team',
+                        properties: {
+                            font: {
+                                fontSize: 14,
+                                fontFamily: ws.fonts.fontStyles.classification.fontFamily
+                            },
+                            color: ws.fonts.fontStyles.classification.fontColor,
+                            left: 4,
+                            width: Ti.UI.SIZE,
+                            textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                            verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,                      
+                            height: 35
+                        }
+                    }]
+                },
+                // Rider wins
+                // -----------------------------------
+                {
+                    type: 'Ti.UI.Label',
+                    bindId: 'wins',
+                    properties: {
+                        font: {
+                            fontSize: ws.fonts.fontStyles.classification.fontSize,
+                            fontFamily: ws.fonts.fontStyles.classification.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.classification.fontColor,
+                        left: 4,
+                        width: 40,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+                        verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,                      
+                        height: 35
+                    }
+                },
+                // Rider points
+                // -----------------------------------
+                {
+                    type: 'Ti.UI.Label',
+                    bindId: 'points',
+                    properties: {
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.classification.fontSize,
+                            fontFamily: ws.fonts.fontStyles.classification.fontFamily
+                        },
+                        color: ws.fonts.fontStyles.classification.fontColor,
+                        left: 4,
+                        width: 40,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+                        verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,                      
+                        height: 35
+                    }
+                }]
+            },
             // Rider item list
             "riderList": {
                 properties: {

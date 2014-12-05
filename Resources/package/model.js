@@ -11,6 +11,7 @@ ws.Model = (function(){
     var _xhr = null;
     var _ridersData = null;  
     var _tracksData = null;  
+    var _classificationData = {};
     /* ------------------------------------------------------------------------------------- */ 
     
     var Model = function(options){
@@ -69,8 +70,8 @@ ws.Model = (function(){
                         context.index = JSON.parse(indexFile.read().text);                         
                     }
                     context.lastIndex = JSON.parse(this.responseText);
-                    Ti.API.info("index: " + context.index.tracksLastUpdate);
-                    Ti.API.info("lastIndex: " + context.lastIndex.tracksLastUpdate);
+                    // Ti.API.info("index: " + context.index.tracksLastUpdate);
+                    // Ti.API.info("lastIndex: " + context.lastIndex.tracksLastUpdate);
                     if( context.onDataReady )
                         context.onDataReady();
                 };
@@ -127,9 +128,7 @@ ws.Model = (function(){
         // ------------------------------------------------------------------------------------
         getRiders: function(callback) {
             var newDataAvailable = false;
-            Ti.API.info("getRiders()")
-            Ti.API.info(new Date(Date.parse("lastIndex.ridersLastUpdate time " + this.lastIndex.ridersLastUpdate)));
-            Ti.API.info(new Date(Date.parse("lastIndex.ridersLastUpdate to UTC " + this.lastIndex.ridersLastUpdate)).toUTCString());
+            Ti.API.info("getRiders()");
             if( this.lastIndex && this.index && Date.parse(this.lastIndex.ridersLastUpdate) > Date.parse(this.index.ridersLastUpdate) ) {
                 // Ti.API.info("Last index: " + Date.parse(this.lastIndex.ridersLastUpdate));
                 // Ti.API.info("Current index: " + Date.parse(this.index.ridersLastUpdate));
@@ -213,7 +212,7 @@ ws.Model = (function(){
                 return trackData;
             }
             
-            Ti.API.info("getTracks()")
+            Ti.API.info("getTracks()");
             if( this.lastIndex && this.index && Date.parse(this.lastIndex.tracksLastUpdate) > Date.parse(this.index.tracksLastUpdate) ) {
                 // Ti.API.info("Last index: " + Date.parse(this.lastIndex.tracksLastUpdate));
                 // Ti.API.info("Current index: " + Date.parse(this.index.tracksLastUpdate));
@@ -257,6 +256,67 @@ ws.Model = (function(){
             }
             this.getTracks(onGetTracksReady);            
         },
+        
+        // Get classification data
+        // ------------------------------------------------------------------------------------
+        getClassification: function(callback, year, category) {
+            var newDataAvailable = false;
+            Ti.API.info("getClassification()");
+            // Ti.API.info(this.index.classificationsLastUpdate[year][category]);
+            // Ti.API.info(this.lastIndex.classificationsLastUpdate[year][category]);
+            // Ti.API.info(
+                // Date.parse(this.lastIndex.classificationsLastUpdate[year][category]) > Date.parse(this.index.classificationsLastUpdate[year][category])
+            // );
+            if( 
+                this.lastIndex 
+                && 
+                this.index 
+                &&
+                this.lastIndex.classificationsLastUpdate && this.index.classificationsLastUpdate
+                &&
+                this.lastIndex.classificationsLastUpdate[year] && this.index.classificationsLastUpdate[year]
+                &&
+                this.lastIndex.classificationsLastUpdate[year][category] && this.index.classificationsLastUpdate[year][category]
+                &&
+                Date.parse(this.lastIndex.classificationsLastUpdate[year][category]) > Date.parse(this.index.classificationsLastUpdate[year][category]) 
+            ){
+                // Ti.API.info("bingo!!!");
+                // Ti.API.info(this.index.classificationsLastUpdate[year][category]);
+                // Ti.API.info(this.lastIndex.classificationsLastUpdate[year][category]);
+                // Ti.API.info("Last index: " + Date.parse(this.index.classificationsLastUpdate[year][category]));
+                // Ti.API.info("Current index: " + Date.parse(this.lastIndex.classificationsLastUpdate[year][category]));
+                newDataAvailable = true;
+                this.index.classificationsLastUpdate[year][category] = this.lastIndex.classificationsLastUpdate[year][category];
+                // Update index data to disk
+                this.saveIndex();
+            }
+            var filename = String(year)+'_'+String(category)+'.json';
+            var jsonClassificationFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory,
+                'data', filename);
+            if( !jsonClassificationFile.exists() || newDataAvailable ) {
+                _xhr.onload = function() {
+                    // Ti.API.info("Getting data json GET");
+                    jsonClassificationFile.write(this.responseText);
+                    _classificationData[year] = {};
+                    // Ti.API.info("data : " + jsonClassificationFile.read().text);
+                    _classificationData[year][category] = JSON.parse(jsonClassificationFile.read().text).classification; 
+                    callback(_classificationData[year][category]);
+                };
+                _xhr.open('GET', this.host + '/data/classification/' + filename);
+                // if( bcn.BASIC_HTTP_AUTH )
+                    // xhr2.setRequestHeader('Authorization','Basic ' + Ti.Utils.base64encode(bcn.USERNAME + ':' + bcn.PASSWORD));
+                _xhr.send();
+            } else {
+                if( !_classificationData[year] ) {
+                    _classificationData[year] = {};
+                    _classificationData[year][category] = JSON.parse(jsonClassificationFile.read().text).classification;
+                } else if( !_classificationData[year][category] ) {
+                    _classificationData[year][category] = JSON.parse(jsonClassificationFile.read().text).classification;
+                }
+                // Ti.API.info("file "+ _classificationData[year][category]);
+                callback(_classificationData[year][category]);
+            }            
+        }
     };
     
     return Model;

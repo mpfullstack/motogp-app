@@ -157,6 +157,7 @@ ws.mainAppView = Ti.UI.createView({
     zIndex: 1
 });
 ws.mainWindow.add(ws.mainAppView);
+ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});
 
 // -----------------------------------------
 // End Main UI App

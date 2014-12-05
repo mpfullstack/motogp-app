@@ -216,4 +216,17 @@ ws.fonts.addFontStyle({
     fontSize: 13,
     fontColor: '#fff'
 });
+
+ws.fonts.addFontStyle({
+    id: 'classification',
+    fontSize: 16,
+    fontColor: '#333'
+});
+
+ws.fonts.addFontStyle({
+    id: 'position',
+    fontSize: 16,
+    fontColor: '#333',
+    fontId: 'oSansExtraBold'
+});
 // -----------------------------------------

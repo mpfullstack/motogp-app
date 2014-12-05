@@ -17,8 +17,5 @@ ws.controller = new ws.Controller({
     startAction: 'default'
 });
 
-// Default Action
-//ws.controller.action("default");
-
 // Start App
 ws.mainWindow.open();

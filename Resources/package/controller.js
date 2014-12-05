@@ -68,6 +68,20 @@ ws.Controller = (function(){
             }
         },
         
+        // It does what is says
+        // ------------------------------------------------------------------------------------
+        hideMainAppView: function() {
+            if( ws.mainAppView )
+                ws.mainAppView.hide();
+        },
+        
+        // It does what is says
+        // ------------------------------------------------------------------------------------
+        showMainAppView: function() {
+            if( ws.mainAppView )
+                ws.mainAppView.show();
+        },
+        
         // StackTrace App
         // ------------------------------------------------------------------------------------        
         stackTrace: [],
@@ -146,18 +160,20 @@ ws.Controller = (function(){
         // ------------------------------------------------------------------------------------
         action: function(name, params) {
             if( name !== this.currentAction ) {
+                this.hideMainAppView();
                 if( this.currentAction != '' )
                     ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});
-                this.emptyMainAppView();
+                this.emptyMainAppView();                                
                 this.currentAction = name;
                 this.pushStackTrace(name);
                 switch(name) {
                     case "default":
-                        ws.topBar.mainButton.setText(ws.translations.translate('default').toUpperCase()); 
                         this.defaultAction();
+                        ws.topBar.mainButton.setText(ws.translations.translate('default').toUpperCase());                        
                         break;
                         
                     case "tracks":
+                        this.tracksAction();
                         ws.topBar.mainButton.setText(ws.translations.translate('tracks').toUpperCase()); 
                         ws.topBar.mainButton.setTextProperty("font", {
                             fontSize : ws.fonts.fontStyles.title.fontSize,
@@ -166,12 +182,12 @@ ws.Controller = (function(){
                             fontStyle: 'italic'                                                   
                         });
                         ws.topBar.mainButton.setImage("/images/menu.png");
-                        ws.topBar.mainButton.setImageSize(42);                  
-                        this.tracksAction();
+                        ws.topBar.mainButton.setImageSize(42);
                         break;
                         
                     case "classification":
-                        ws.topBar.mainButton.setText(ws.translations.translate('classification').toUpperCase());
+                        this.classificationAction();
+                        ws.topBar.mainButton.setText(ws.translations.translate('classification').toUpperCase() + ' 2014');
                         ws.topBar.mainButton.setTextProperty("font", {
                             fontSize : ws.fonts.fontStyles.title.fontSize,
                             fontFamily : ws.fonts.fontStyles.title.fontSize.fontFamily,
@@ -179,11 +195,11 @@ ws.Controller = (function(){
                             fontStyle: 'italic'                         
                         });
                         ws.topBar.mainButton.setImage("/images/menu.png");
-                        ws.topBar.mainButton.setImageSize(42);
-                        this.classificationAction();
+                        ws.topBar.mainButton.setImageSize(42);                        
                         break;
                         
                     case "riders":
+                        this.ridersAction();
                         ws.topBar.mainButton.setText(ws.translations.translate('riders').toUpperCase());
                         ws.topBar.mainButton.setTextProperty("font", {
                             fontSize : ws.fonts.fontStyles.title.fontSize,
@@ -192,30 +208,30 @@ ws.Controller = (function(){
                             fontStyle: 'italic'                                                     
                         });
                         ws.topBar.mainButton.setImage("/images/menu.png");
-                        ws.topBar.mainButton.setImageSize(42);                            
-                        this.ridersAction();
+                        ws.topBar.mainButton.setImageSize(42);
                         break;
                     
                     case "riderDetail":
+                        this.riderDetailAction(params);
                         ws.topBar.mainButton.setTextProperty("font", {
                             fontSize: ws.fonts.fontStyles.subMenu.fontSize                            
                         });
                         ws.topBar.mainButton.setText(ws.translations.translate('riders').toUpperCase());
                         ws.topBar.mainButton.setImage("/images/arrow_back.png");
-                        ws.topBar.mainButton.setImageSize(21);
-                        this.riderDetailAction(params);
+                        ws.topBar.mainButton.setImageSize(21);                        
                         break;
                     
                     case "trackDetail":
+                        this.trackDetailAction(params);
                         ws.topBar.mainButton.setTextProperty("font", {
                             fontSize: ws.fonts.fontStyles.subMenu.fontSize                            
                         });
                         ws.topBar.mainButton.setText(ws.translations.translate('tracks').toUpperCase());
                         ws.topBar.mainButton.setImage("/images/arrow_back.png");
-                        ws.topBar.mainButton.setImageSize(21);
-                        this.trackDetailAction(params);
+                        ws.topBar.mainButton.setImageSize(21);                        
                         break;
                     case "settings":
+                        this.settingsAction(params);
                         ws.topBar.mainButton.setText(ws.translations.translate('settings').toUpperCase());
                         ws.topBar.mainButton.setTextProperty("font", {
                             fontSize : ws.fonts.fontStyles.title.fontSize,
@@ -224,8 +240,7 @@ ws.Controller = (function(){
                             fontStyle: 'italic'                                                     
                         });
                         ws.topBar.mainButton.setImage("/images/menu.png");
-                        ws.topBar.mainButton.setImageSize(42); 
-                        this.settingsAction(params);
+                        ws.topBar.mainButton.setImageSize(42);
                 }
             }
         },
@@ -651,7 +666,147 @@ ws.Controller = (function(){
         // Classification action
         // ------------------------------------------------------------------------------------
         classificationAction: function() {
-            this.actionEnd();
+            var context = this;
+            var onDataReady = function(classificationData) {
+                var data = [];
+                var time = new Date().getTime();
+                for (var i = 0; i < classificationData.length; i++) {
+                    var result = classificationData[i];
+                    data.push({
+                        position: {
+                            text: result.position
+                        },
+                        name: {
+                            text: result.name
+                        },
+                        team: {
+                            text: result.team
+                        },
+                        wins: {
+                            text: result.wins
+                        },
+                        points: {
+                            text: result.points
+                        },
+                        properties: {
+                            itemId: result.riderId,
+                            accessoryType: Ti.UI.LIST_ACCESSORY_TYPE_NONE,
+                            backgroundColor: ((i%2==0)?'#fff':'#eee')
+                        }
+                    });
+                }
+                var time2 = new Date().getTime();
+                Ti.API.info("Time loading items: " + ws.utils.toSec(time2-time));
+                
+                var headerHeight = 35;
+                ws.mainAppView.add(
+                    Ti.UI.createView({
+                        width: ws.platform.screenWidth(),
+                        height: Ti.UI.FILL,
+                        top: 0,
+                        backgroundColor: 'transparent',
+                        layout: 'vertical',
+                        opacity: 0
+                    })
+                );
+                // Header
+                ws.mainAppView.children[0].add(
+                    Ti.UI.createView({
+                        width: ws.platform.screenWidth(),
+                        height: headerHeight,
+                        top: 0,
+                        backgroundColor: '#333',
+                        layout: 'horizontal'
+                    })
+                );
+                // Position
+                ws.mainAppView.children[0].children[0].add(
+                    Ti.UI.createLabel({
+                        text: 'Pos',
+                        left: 0,
+                        top: 7,
+                        width: 30,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.classification.fontSize,
+                            fontFamily: ws.fonts.fontStyles.classification.fontFamily
+                        },
+                        color: '#fff'
+                    })  
+                );
+                // Name
+                ws.mainAppView.children[0].children[0].add(
+                    Ti.UI.createLabel({
+                        text: 'Rider',
+                        left: 4,
+                        width: '60%',
+                        top: 7,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.classification.fontSize,
+                            fontFamily: ws.fonts.fontStyles.classification.fontFamily
+                        },
+                        color: '#fff'
+                    })  
+                );
+                // Wins
+                ws.mainAppView.children[0].children[0].add(
+                    Ti.UI.createLabel({
+                        text: 'Wins',
+                        left: 4,
+                        width: 40,
+                        top: 7,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.classification.fontSize,
+                            fontFamily: ws.fonts.fontStyles.classification.fontFamily
+                        },
+                        color: '#fff'
+                    })  
+                );
+                // Points
+                ws.mainAppView.children[0].children[0].add(
+                    Ti.UI.createLabel({
+                        text: 'Pnts',
+                        left: 4,
+                        width: 40,
+                        top: 7,
+                        textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+                        font: {
+                            fontWeight: 'bold',
+                            fontSize: ws.fonts.fontStyles.classification.fontSize,
+                            fontFamily: ws.fonts.fontStyles.classification.fontFamily
+                        },
+                        color: '#fff'
+                    })  
+                );
+                // ListView            
+                ws.mainAppView.children[0].add(
+                    Ti.UI.createListView({
+                        top: 0,
+                        left: 0,
+                        zIndex: 2,
+                        separatorColor: 'transparent',
+                        width: ws.platform.screenWidth(),// - 16,
+                        height: ws.platform.screenHeight() - ws.topBar.height - headerHeight,
+                        templates: {
+                            default: context.template.get("classificationList")
+                        },
+                        defaultItemTemplate: 'default',
+                        sections: [
+                            Ti.UI.createListSection({
+                                items: data
+                            })
+                        ],
+                        bubbleParent: false
+                    })
+                );
+                context.actionEnd();
+            };
+            this.model.getClassification(onDataReady,2014,'motogp');            
         },
         
         // Riders action
@@ -1776,6 +1931,7 @@ ws.Controller = (function(){
         // ------------------------------------------------------------------------------------
         actionEnd: function() {
             ws.animation.hideActivityIndicator();
+            this.showMainAppView();
             ws.mainAppView.getChildren()[0].animate({
                 opacity: 1,
                 duration: 50//250
