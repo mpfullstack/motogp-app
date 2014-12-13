@@ -21,7 +21,11 @@ ws.Controller = (function(){
             context.startAction = options.startAction; 
             if( !context.template )
                 context.template = new ws.Template();
-            // if( !this.model )
+            //TODO: Check if event is already bind to mainWindow
+            if( ws.platform.android() )
+                ws.mainWindow.addEventListener('androidback', function() {
+                    context.actionBack({backButton: true});
+                });
             context.model = new ws.Model({
                 onDataReady: function(){
                     context.action(context.startAction);
@@ -39,6 +43,12 @@ ws.Controller = (function(){
             ws.mainMenu.reload();
             this.action(action);          
         },
+        
+        // Called when android back button is pressed
+        // ------------------------------------------------------------------------------------
+        // androidBackButton: function(context) {
+            // context.actionBack();
+        // },
         
         // Start action name
         // ------------------------------------------------------------------------------------
@@ -115,15 +125,44 @@ ws.Controller = (function(){
         // Action Back
         // ------------------------------------------------------------------------------------
         actionBack: function(params) {
+            if( !params )
+                params = {};            
             var regex = /.+Detail/g;
-            // If we are in a detail action
-            if( regex.test(this.currentAction) ) {
+            if( ws.mainMenu.isVisible() ) {
+                ws.animation.slideTo({
+                    view : ws.mainMenu.view,
+                    direction : 'left',
+                    onComplete : function(e) {
+                        ws.mainMenu.setVisible(false);
+                    }
+                });
+                ws.mainMenu.opacityView.animate({
+                    opacity : 0,
+                    duration : 300                    
+                },
+                function(e) {
+                    ws.mainMenu.opacityView.hide()
+                });
+            }
+            // If we are in a detail action 
+            else if( regex.test(this.currentAction) ) {
+                if( this.stackTrace.length == 1 ) {
+                    ws.mainWindow.close();
+                    return;
+                }
                 this.popStackTrace();
                 this.action(this.popStackTrace());
             } 
             // If we are in a main action
-            else {
-                if (!ws.mainMenu.isVisible()) {
+            else {             
+                if( "backButton" in params ) {
+                    if( this.stackTrace.length == 1 ) {
+                        ws.mainWindow.close();
+                        return;
+                    }
+                    this.popStackTrace();
+                    this.action(this.popStackTrace());
+                } else {   
                     ws.mainMenu.opacityView.show();
                     ws.mainMenu.setVisible(true);
                     ws.animation.slideFrom({
@@ -136,21 +175,6 @@ ws.Controller = (function(){
                     ws.mainMenu.opacityView.animate({
                         opacity : opacity,
                         duration : 300
-                    });
-                } else {
-                    ws.animation.slideTo({
-                        view : ws.mainMenu.view,
-                        direction : 'left',
-                        onComplete : function(e) {
-                            ws.mainMenu.setVisible(false);
-                        }
-                    });
-                    ws.mainMenu.opacityView.animate({
-                        opacity : 0,
-                        duration : 300                    
-                    },
-                    function(e) {
-                        ws.mainMenu.opacityView.hide()
                     });
                 }
             }
