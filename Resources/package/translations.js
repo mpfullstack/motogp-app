@@ -22,6 +22,30 @@ ws.translations.set("riders", {
     "en": "Riders"
 });
 
+ws.translations.set("rider", {
+    "ca": "Pilot",
+    "es": "Piloto",
+    "en": "Rider"
+});
+
+ws.translations.set("position_abbr", {
+    "ca": "P.",
+    "es": "P.",
+    "en": "P."
+});
+
+ws.translations.set("wins_abbr", {
+    "ca": "W.",
+    "es": "V.",
+    "en": "V."
+});
+
+ws.translations.set("points_abbr", {
+    "ca": "Pts.",
+    "es": "Ptos.",
+    "en": "Pts."
+});
+
 ws.translations.set("settings", {
     "ca": "Configuració",
     "es": "Configuración",

@@ -39,6 +39,8 @@ ws.Template = (function(){
                     }
                 },
                 childTemplates: [
+                // Rider position
+                // -----------------------------------
                 {
                    type: 'Ti.UI.Label',
                     bindId: 'position',
@@ -50,7 +52,7 @@ ws.Template = (function(){
                         },
                         color: ws.fonts.fontStyles.position.fontColor,                       
                         left: 0,
-                        width: 30,
+                        width: 24,
                         zIndex: 0,
                         textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
                         verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
@@ -60,8 +62,8 @@ ws.Template = (function(){
                 {
                     type: 'Ti.UI.View',
                     properties: {                        
-                        left: 4,
-                        width: '60%',
+                        left: 8,
+                        width: '63%',
                         height: 35,
                         layout: 'horizontal'
                     },
@@ -116,7 +118,7 @@ ws.Template = (function(){
                         },
                         color: ws.fonts.fontStyles.classification.fontColor,
                         left: 4,
-                        width: 40,
+                        width: 34,
                         textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
                         verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,                      
                         height: 35
@@ -135,7 +137,7 @@ ws.Template = (function(){
                         },
                         color: ws.fonts.fontStyles.classification.fontColor,
                         left: 4,
-                        width: 40,
+                        width: 38,
                         textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
                         verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,                      
                         height: 35
@@ -296,7 +298,7 @@ ws.Template = (function(){
                 {
                     type: 'Ti.UI.View',
                     properties: {                        
-                        top: 38,
+                        top: 45,
                         left: 150,
                         width: Ti.UI.FILL,
                         height: Ti.UI.SIZE,
@@ -321,23 +323,62 @@ ws.Template = (function(){
                             height: Ti.UI.SIZE
                         }
                     },
-                    // TV
+                    // Time
                     // -----------------------------------                
                     {
                         type: 'Ti.UI.Label',
-                        bindId: 'tv',
+                        bindId: 'time',
                         properties: {
                             font: {
                                 fontSize: ws.fonts.fontStyles.details.fontSize,
                                 fontFamily: ws.fonts.fontStyles.details.fontFamily
                             },
                             color: ws.fonts.fontStyles.details.fontColor,
-                            top: 5,
+                            top: 8,
                             left: 5,
                             width: Ti.UI.SIZE,
                             height: Ti.UI.SIZE
                         }
                     },
+                    // TV
+                    // -----------------------------------    
+                                
+                    {
+                        type: 'Ti.UI.View',
+                        properties: {                        
+                            top: 8,
+                            left: 5,
+                            width: Ti.UI.FILL,
+                            height: Ti.UI.SIZE,
+                            layout: 'horizontal'
+                        },
+                        childTemplates: [                 
+                        {
+                            type: 'Ti.UI.ImageView',
+                            bindId: 'tv_icon',
+                            properties: {
+                                top: 0,
+                                left: 0,
+                                width: ws.platform.toDip(20)
+                            }
+                        },
+                        {
+                            type: 'Ti.UI.Label',
+                            bindId: 'tv',
+                            properties: {
+                                font: {
+                                    fontSize: ws.fonts.fontStyles.details.fontSize,
+                                    fontFamily: ws.fonts.fontStyles.details.fontFamily
+                                },
+                                color: ws.fonts.fontStyles.details.fontColor,
+                                top: 0,
+                                left: 5,
+                                verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+                                width: Ti.UI.SIZE,
+                                height: Ti.UI.SIZE
+                            }
+                        }]
+                    }/*,
                     // Length Label
                     // -----------------------------------                
                     {
@@ -371,7 +412,7 @@ ws.Template = (function(){
                             width: Ti.UI.SIZE,
                             height: Ti.UI.SIZE
                         }
-                    }
+                    }*/
                     ]
                 },
                 {

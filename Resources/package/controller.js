@@ -115,6 +115,7 @@ ws.Controller = (function(){
         // Pops last action from stack trace 
         // ------------------------------------------------------------------------------------        
         popStackTrace: function() {
+            Ti.API.info("StackTrace " + this.stackTrace);            
             return this.stackTrace.pop();
         },
         
@@ -640,15 +641,21 @@ ws.Controller = (function(){
                         textDate: {
                             text: track.textDate[ws.translations.getLanguage()]
                         },
+                        time: {
+                            text: track.time + ' (CET)'
+                        },
                         tv: {
                             text: track.tv[ws.translations.getLanguage()]
                         },
+                        tv_icon: {
+                            image: track.tv_icon
+                        }/*,
                         length: {
                             text: track.length + " m"
                         },
                         constructed: {
                             text: ws.translations.translate('constructed') + " " + track.constructed
-                        },                        
+                        }*/,                        
                         properties: {
                             itemId: trackId,
                             accessoryType: Ti.UI.LIST_ACCESSORY_TYPE_NONE,
@@ -746,10 +753,10 @@ ws.Controller = (function(){
                 // Position
                 ws.mainAppView.children[0].children[0].add(
                     Ti.UI.createLabel({
-                        text: 'Pos',
+                        text: ws.translations.translate('position_abbr'),
                         left: 0,
                         top: 7,
-                        width: 30,
+                        width: 24,
                         textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
                         font: {
                             fontWeight: 'bold',
@@ -762,9 +769,9 @@ ws.Controller = (function(){
                 // Name
                 ws.mainAppView.children[0].children[0].add(
                     Ti.UI.createLabel({
-                        text: 'Rider',
-                        left: 4,
-                        width: '60%',
+                        text: ws.translations.translate('rider'),
+                        left: 8,
+                        width: '63%',
                         top: 7,
                         textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
                         font: {
@@ -778,9 +785,9 @@ ws.Controller = (function(){
                 // Wins
                 ws.mainAppView.children[0].children[0].add(
                     Ti.UI.createLabel({
-                        text: 'Wins',
+                        text: ws.translations.translate('wins_abbr'),
                         left: 4,
-                        width: 40,
+                        width: 34,
                         top: 7,
                         textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
                         font: {
@@ -794,9 +801,9 @@ ws.Controller = (function(){
                 // Points
                 ws.mainAppView.children[0].children[0].add(
                     Ti.UI.createLabel({
-                        text: 'Pnts',
+                        text: ws.translations.translate('points_abbr'),
                         left: 4,
-                        width: 40,
+                        width: 38,
                         top: 7,
                         textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
                         font: {
@@ -1136,7 +1143,7 @@ ws.Controller = (function(){
                     width: ws.platform.screenWidth(),
                     contentWidth: ws.platform.screenWidth(),
                     contentHeight: 'auto',
-                    height: Ti.UI.FILL,                
+                    height: Ti.UI.FILL,        
                     backgroundColor: '#333'
                 })
             );
@@ -1175,12 +1182,13 @@ ws.Controller = (function(){
                 backgroundImage: '/images/bg-jerez.png',
                 opacity: 0
             });
+            var titleViewHeight = 65;
             mainTrackDetailView.add(
                 Ti.UI.createView({
                     top: 0,
                     left: 0,
                     width: ws.platform.screenWidth(),                                
-                    height: 65,
+                    height: titleViewHeight,
                     backgroundColor: '#000',
                     opacity: 0.8,
                     zIndex: 4
@@ -1233,7 +1241,9 @@ ws.Controller = (function(){
                     left: 0,
                     zIndex: 3,
                     width: ws.platform.screenWidth(),
-                    contentWidth: ws.platform.screenWidth(),                
+                    contentWidth: ws.platform.screenWidth(),   
+                    contentHeight: 'auto',
+                    height: ws.platform.screenHeight(),   
                     bubbleParent: false,
                     backgroundColor: 'transparent',
                     layout: 'vertical'                    
@@ -1296,7 +1306,7 @@ ws.Controller = (function(){
                     }                    
                     
                     break;
-                case 'right': // Motorland, Jerez
+                case 'right': // Motorland, Jerez, Qatar???
                     var containerDetailsWidth = '55%';
                     var containerDetailsLeft = 8;
                     // Calculate height of resulting track image and divide by two to positioning view 
@@ -1308,7 +1318,11 @@ ws.Controller = (function(){
                         containerDetailsTop -= 40;
                         leftImage = '36%';
                         topImage = 45  
-                    } 
+                    } else if( track.qname == 'qatar') {
+                        containerDetailsTop -= 115;
+                        leftImage = '28%';
+                        topImage = 65  
+                    }
                     break;
                 case 'bottom-left': // Motegui
                     var containerDetailsWidth = '52%';
@@ -1405,7 +1419,7 @@ ws.Controller = (function(){
                     width: Ti.UI.SIZE,
                     textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
                     left: 0,
-                    top: 0,    
+                    top: (track.qname=='qatar'?45:0),    
                     font: {
                         fontSize: ws.fonts.fontStyles.trackDetails.fontSize,
                         fontFamily: ws.fonts.fontStyles.details.fontFamily
@@ -1620,7 +1634,13 @@ ws.Controller = (function(){
                     );
                 }
             }
-            mainTrackDetailView.children[2].add( contentView );                   
+            mainTrackDetailView.children[2].add( contentView );
+            mainTrackDetailView.children[2].add(
+                Ti.UI.createView({
+                    width: Ti.UI.FILL,
+                    height: 10
+                }) 
+            );     
             ws.mainAppView.add( mainTrackDetailView );
             this.actionEnd();
         },
@@ -1960,6 +1980,13 @@ ws.Controller = (function(){
                 opacity: 1,
                 duration: 50//250
             })
+            // Testing
+            /*ws.mainAppView.getChildren()[0].setOpacity(1);
+            ws.animation.slideFrom({
+                direction: 'left',
+                view: ws.mainAppView.getChildren()[0],
+                duration: 300
+            });*/
         }
         
     };
