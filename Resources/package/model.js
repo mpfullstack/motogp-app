@@ -39,7 +39,7 @@ ws.Model = (function(){
         
         // Default host
         // ------------------------------------------------------------------------------------
-        host: 'http://clients.welvisolutions.com', //'http://motogp.welvi.com',  
+        host: 'http://clients.welvisolutions.com',//'http://10.255.255.1',//, //'http://motogp.welvi.com',  
         
         // Initialize
         // ------------------------------------------------------------------------------------
@@ -76,10 +76,39 @@ ws.Model = (function(){
                         context.onDataReady();
                 };
                 _xhr.onerror = function(){
-                    Ti.API.info("Error getting index.json");
+                    // Ti.API.info("Error getting index.json");
                     var indexFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'data', 'index.json');
-                    context.index = JSON.parse(indexFile.read().text);
-                    context.lastIndex = context.index;
+                    if( !indexFile.exists() ) {
+                        // No network connection
+                        if( !Ti.Network.online ) {                        
+                            var dialog = Ti.UI.createAlertDialog({
+                                message: ws.translations.translate('no_data_and_no_connection'),
+                                ok: 'OK',
+                                title: ws.translations.translate('connection')
+                            });
+                            dialog.addEventListener('click', function(e){
+                                ws.mainWindow.close();
+                            });
+                            dialog.show();
+                        }
+                        // Network connection error
+                        else {
+                            var dialog = Ti.UI.createAlertDialog({
+                                message: ws.translations.translate('no_data_and_no_server_connection'),
+                                ok: 'OK',
+                                title: ws.translations.translate('connection')
+                            });
+                            dialog.addEventListener('click', function(e){
+                                ws.mainWindow.close();
+                            });
+                            dialog.show();
+                        }
+                    } else {
+                        context.index = JSON.parse(indexFile.read().text);
+                        context.lastIndex = context.index;
+                        if( context.onDataReady )
+                            context.onDataReady();
+                    }
                 }
                 _xhr.open('GET', this.host + '/data/index.json');
                 // if( bcn.BASIC_HTTP_AUTH )
@@ -88,6 +117,7 @@ ws.Model = (function(){
                 this.setLastCheckTime(new Date().getTime());
             } else {
                 var indexFile = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'data', 'index.json');
+                //TODO: Check if indexFile exists
                 context.index = JSON.parse(indexFile.read().text);
                 context.lastIndex = context.index;
                 if( context.onDataReady )

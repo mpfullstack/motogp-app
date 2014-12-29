@@ -13,12 +13,12 @@
     <url>http://www.welvisolutions.com</url>
     <description>Application that gives you information about riders, races and championchip classification of MotoGP.</description>
     <copyright>2014 by WS</copyright>
-    <icon>appicon.png</icon>
+    <icon>ic_launcher.png</icon>
     <statusbar-style>default</statusbar-style>
     <statusbar-hidden>false</statusbar-hidden>
     <fullscreen>false</fullscreen>
     <navbar-hidden>true</navbar-hidden>
-    <analytics>true</analytics>
+    <analytics>false</analytics>
     <guid>8a700047-b57e-452c-8e2a-8a3f4b6d9ff8</guid>
     <property name="ti.ui.defaultunit" type="string">dp</property>
     <ios>

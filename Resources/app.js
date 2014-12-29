@@ -14,7 +14,19 @@ Ti.include("package/main.js");
 
 // Main App Controller
 ws.controller = new ws.Controller({
-    startAction: 'default'
+    startAction: 'default',
+    onOpen: function(e) {
+        // alert("onOpen");
+    },    
+    onPause: function(e) {
+        // alert("onPause");
+    },
+    onResume: function(e) {
+        // alert("onResume");
+    },
+    onDestroy: function(e) {
+        // alert("onDestroy");
+    }
 });
 
 // Start App

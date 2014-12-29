@@ -62,7 +62,7 @@ ws.topBar = new ws.menu.TopBar({
     })
 });
 ws.topBar.mainButton.setImageLeft(0);
-ws.topBar.mainButton.setTextProperty("left", 0);
+//ws.topBar.mainButton.setTextProperty("left", 0);
 ws.mainWindow.add(ws.topBar.view);
 
 // MainMenu
@@ -73,26 +73,44 @@ ws.mainMenu = new ws.menu.Main({
     height: ws.platform.screenHeight() - ws.topBar.height,
     width: ws.platform.screenWidth() / 8 * 6,
     bgColor: "#333",
-    mainWindow: ws.mainWindow
+    mainWindow: ws.mainWindow,
+    onClick: function(obj) {
+        // Temp testing
+        ws.animation.slideTo({
+            view : ws.mainAppView,
+            direction : 'left',
+            duration: 125,
+            left: 0        
+        });
+        ws.animation.slideTo({
+            view : ws.topBar.mainButton.imageView,
+            left: 0,
+            direction : 'left',
+            duration: 150
+        });
+        ws.animation.slideTo({
+            view: ws.mainMenu.view,
+            direction: 'left',
+            duration: 150,
+            onComplete : function(e) {
+                Ti.API.info("CLICK ON " + obj.source.id);
+                ws.controller.action(obj.source.id);
+                ws.mainMenu.setVisible(false);
+                ws.mainMenu.opacityView.hide();
+            }
+        });
+        // End temp testing
+        /*ws.mainMenu.opacityView.animate({
+            opacity: 0,
+            duration: 150,
+        },function(e) {                
+            Ti.API.info("CLICK ON " + obj.source.id);
+            ws.controller.action(obj.source.id);
+            ws.mainMenu.setVisible(false);
+            ws.mainMenu.opacityView.hide();
+        });*/
+    }
 });
-
-var onClickMainMenuOption = function(obj) {
-    ws.animation.slideTo({
-        view: ws.mainMenu.view,
-        direction: 'left',
-        duration: 150,
-        onComplete: function(e) {}
-    });
-    ws.mainMenu.opacityView.animate({
-        opacity: 0,
-        duration: 150,
-    },function(e) {                
-        Ti.API.info("CLICK ON " + obj.source.id);
-        ws.controller.action(obj.source.id);
-        ws.mainMenu.setVisible(false);
-        ws.mainMenu.opacityView.hide();
-    });
-}
 
 var mainMenuOptions = [
     {
@@ -139,10 +157,10 @@ for( var i=0; i<mainMenuOptions.length; i++ ) {
         color: '#eee',
         imageUrl: mainMenuOptions[i].imageUrl,
         imageSize: 28,
+        left: 6,
+        textLeft: 8,
         height: 50,
-        width: Ti.UI.FILL,
-        left: 5,
-        onClick: onClickMainMenuOption
+        width: Ti.UI.FILL        
     });
 }
 
@@ -158,7 +176,6 @@ ws.mainAppView = Ti.UI.createView({
 });
 ws.mainWindow.add(ws.mainAppView);
 ws.animation.showActivityIndicator(ws.mainWindow, {top: ws.topBar.height, height: ws.platform.screenHeight()-ws.topBar.height});
-
 // -----------------------------------------
 // End Main UI App
 // -----------------------------------------

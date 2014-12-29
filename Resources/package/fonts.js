@@ -194,8 +194,14 @@ ws.fonts.addFontStyle({
     fontSize: 18
 });
 ws.fonts.addFontStyle({
+    id: 'detailTrackTitle',
+    fontSize: 27,
+    fontColor: '#fff',
+    fontId: 'oSansExtraBold'
+});
+ws.fonts.addFontStyle({
     id: 'detailTrackDate',
-    fontSize: 16,
+    fontSize: 17,
     fontColor: '#fff'
 });
 ws.fonts.addFontStyle({
@@ -206,7 +212,7 @@ ws.fonts.addFontStyle({
 
 ws.fonts.addFontStyle({
     id: 'homeTrackTitle',
-    fontSize: 30,
+    fontSize: 27,
     fontColor: '#333',
     fontId: 'oSansExtraBold'
 });

@@ -21,11 +21,56 @@ ws.Controller = (function(){
             context.startAction = options.startAction; 
             if( !context.template )
                 context.template = new ws.Template();
-            //TODO: Check if event is already bind to mainWindow
-            if( ws.platform.android() )
-                ws.mainWindow.addEventListener('androidback', function() {
-                    context.actionBack({backButton: true});
-                });
+            // Setup App events            
+            ws.mainWindow.addEventListener('open', function(e) {
+                // Android
+                Ti.API.info("Opening App...");
+                if( ws.platform.android() ) {
+                    var currentActivity = e.source.activity;
+                    ws.mainWindow.addEventListener('androidback', function() {
+                        context.actionBack({backButton: true});
+                    });
+                    // onOpen
+                    if( 'onOpen' in options )
+                        options.onOpen();
+                    // onPause
+                    if( 'onPause' in options )
+                        currentActivity.addEventListener('pause', options.onPause);
+                    // onResume
+                    if( 'onResume' in options )
+                        currentActivity.addEventListener('resume', options.onResume);
+                    // onDestroy
+                    if( 'onDestroy' in options )
+                        currentActivity.addEventListener('destroy', options.onDestroy);
+                                        
+                    //TODO: It was supposed to use settings button to show and hide menu
+                    /*currentActivity.onCreateOptionsMenu = function(e) {
+                        Ti.API.info('onCreateOptionsMenu!');
+                        if( ws.mainMenu.isVisible() )
+                            ws.mainMenu.hide();
+                        else
+                            ws.mainMenu.show();
+                    }
+                    currentActivity.onPrepareOptionsMenu = function(e) {
+                        Ti.API.info('onPrepareOptionsMenu!');
+                        if( ws.mainMenu.isVisible() )
+                            ws.mainMenu.hide();
+                        else
+                            ws.mainMenu.show();
+                    }  */                  
+                }
+                // iOS 
+                else {
+                    // onOpen
+                    if( 'onOpen' in options )
+                        options.onOpen();
+                }
+            });
+            if( ws.platform.iphone() ) {
+                // onResume
+                if( 'onResume' in options )
+                    Ti.App.addEventListener('resumed', options.onResume);
+            }          
             context.model = new ws.Model({
                 onDataReady: function(){
                     context.action(context.startAction);
@@ -36,8 +81,8 @@ ws.Controller = (function(){
         // Reset/Reload App
         // ------------------------------------------------------------------------------------
         reload: function(action) {
-            this.state = 'initial';
-            this.stackTrace = [];
+            this.state = 'initial';            
+            this.stackTrace = ['default'];            
             this.currentAction = '';            
             this.emptyMainAppView();
             ws.mainMenu.reload();
@@ -123,30 +168,23 @@ ws.Controller = (function(){
         // ------------------------------------------------------------------------------------
         currentAction: '',
         
+        // Check if app in a detail action
+        // ------------------------------------------------------------------------------------
+        inDetailAction: function() {
+            var regex = /.+Detail/g;
+            return regex.test(this.currentAction);
+        },
+        
         // Action Back
         // ------------------------------------------------------------------------------------
         actionBack: function(params) {
             if( !params )
-                params = {};            
-            var regex = /.+Detail/g;
+                params = {};
             if( ws.mainMenu.isVisible() ) {
-                ws.animation.slideTo({
-                    view : ws.mainMenu.view,
-                    direction : 'left',
-                    onComplete : function(e) {
-                        ws.mainMenu.setVisible(false);
-                    }
-                });
-                ws.mainMenu.opacityView.animate({
-                    opacity : 0,
-                    duration : 300                    
-                },
-                function(e) {
-                    ws.mainMenu.opacityView.hide()
-                });
+                ws.mainMenu.hide();
             }
             // If we are in a detail action 
-            else if( regex.test(this.currentAction) ) {
+            else if( this.inDetailAction() ) {
                 if( this.stackTrace.length == 1 ) {
                     ws.mainWindow.close();
                     return;
@@ -164,22 +202,18 @@ ws.Controller = (function(){
                     this.popStackTrace();
                     this.action(this.popStackTrace());
                 } else {   
-                    ws.mainMenu.opacityView.show();
-                    ws.mainMenu.setVisible(true);
-                    ws.animation.slideFrom({
-                        view : ws.mainMenu.view,
-                        left: ws.mainMenu.paddingLeft,
-                        direction : 'left',
-                        onComplete : function(e) {}
-                    });
-                    var opacity = ws.mainMenu.width / ((ws.mainMenu.width + ws.mainMenu.opacityOffset) * 0.01) / 100;
-                    ws.mainMenu.opacityView.animate({
-                        opacity : opacity,
-                        duration : 300
-                    });
+                    ws.mainMenu.show();
                 }
             }
         },
+        
+        // Last rider id visited
+        // ------------------------------------------------------------------------------------
+        lastRiderId: null,
+        
+        // Last track id visited
+        // ------------------------------------------------------------------------------------
+        lastTrackId: null,
         
         // Action controller
         // ------------------------------------------------------------------------------------
@@ -194,78 +228,37 @@ ws.Controller = (function(){
                 switch(name) {
                     case "default":
                         this.defaultAction();
-                        ws.topBar.mainButton.setText(ws.translations.translate('default').toUpperCase());                        
+                        ws.topBar.mainButton.toMainState(ws.translations.translate('default').toUpperCase());                   
                         break;
                         
                     case "tracks":
                         this.tracksAction();
-                        ws.topBar.mainButton.setText(ws.translations.translate('tracks').toUpperCase()); 
-                        ws.topBar.mainButton.setTextProperty("font", {
-                            fontSize : ws.fonts.fontStyles.title.fontSize,
-                            fontFamily : ws.fonts.fontStyles.title.fontSize.fontFamily,
-                            fontWeight: 'bold',
-                            fontStyle: 'italic'                                                   
-                        });
-                        ws.topBar.mainButton.setImage("/images/menu.png");
-                        ws.topBar.mainButton.setImageSize(42);
+                        ws.topBar.mainButton.toMainState(ws.translations.translate('tracks').toUpperCase());
                         break;
                         
                     case "classification":
                         this.classificationAction();
-                        ws.topBar.mainButton.setText(ws.translations.translate('classification').toUpperCase() + ' 2014');
-                        ws.topBar.mainButton.setTextProperty("font", {
-                            fontSize : ws.fonts.fontStyles.title.fontSize,
-                            fontFamily : ws.fonts.fontStyles.title.fontSize.fontFamily,
-                            fontWeight: 'bold',
-                            fontStyle: 'italic'                         
-                        });
-                        ws.topBar.mainButton.setImage("/images/menu.png");
-                        ws.topBar.mainButton.setImageSize(42);                        
+                        ws.topBar.mainButton.toMainState(ws.translations.translate('classification').toUpperCase() + ' 2014');                      
                         break;
                         
                     case "riders":
                         this.ridersAction();
-                        ws.topBar.mainButton.setText(ws.translations.translate('riders').toUpperCase());
-                        ws.topBar.mainButton.setTextProperty("font", {
-                            fontSize : ws.fonts.fontStyles.title.fontSize,
-                            fontFamily : ws.fonts.fontStyles.title.fontSize.fontFamily,
-                            fontWeight: 'bold',
-                            fontStyle: 'italic'                                                     
-                        });
-                        ws.topBar.mainButton.setImage("/images/menu.png");
-                        ws.topBar.mainButton.setImageSize(42);
+                        ws.topBar.mainButton.toMainState(ws.translations.translate('riders').toUpperCase());
                         break;
                     
                     case "riderDetail":
                         this.riderDetailAction(params);
-                        ws.topBar.mainButton.setTextProperty("font", {
-                            fontSize: ws.fonts.fontStyles.subMenu.fontSize                            
-                        });
-                        ws.topBar.mainButton.setText(ws.translations.translate('riders').toUpperCase());
-                        ws.topBar.mainButton.setImage("/images/arrow_back.png");
-                        ws.topBar.mainButton.setImageSize(21);                        
+                        ws.topBar.mainButton.toDetailState(ws.translations.translate('riders').toUpperCase());
                         break;
                     
                     case "trackDetail":
                         this.trackDetailAction(params);
-                        ws.topBar.mainButton.setTextProperty("font", {
-                            fontSize: ws.fonts.fontStyles.subMenu.fontSize                            
-                        });
-                        ws.topBar.mainButton.setText(ws.translations.translate('tracks').toUpperCase());
-                        ws.topBar.mainButton.setImage("/images/arrow_back.png");
-                        ws.topBar.mainButton.setImageSize(21);                        
+                        ws.topBar.mainButton.toDetailState(ws.translations.translate('tracks').toUpperCase());           
                         break;
                     case "settings":
                         this.settingsAction(params);
-                        ws.topBar.mainButton.setText(ws.translations.translate('settings').toUpperCase());
-                        ws.topBar.mainButton.setTextProperty("font", {
-                            fontSize : ws.fonts.fontStyles.title.fontSize,
-                            fontFamily : ws.fonts.fontStyles.title.fontSize.fontFamily,
-                            fontWeight: 'bold',
-                            fontStyle: 'italic'                                                     
-                        });
-                        ws.topBar.mainButton.setImage("/images/menu.png");
-                        ws.topBar.mainButton.setImageSize(42);
+                        ws.topBar.mainButton.toMainState(ws.translations.translate('settings').toUpperCase());
+                        break;
                 }
             }
         },
@@ -286,11 +279,12 @@ ws.Controller = (function(){
                     zIndex: 3
                 });
                 ws.mainAppView.add(homeContainerView);
+                var headerHeight = 44;
                 // Adding Header container
                 homeContainerView.add(
                     Ti.UI.createView({
                         width: ws.platform.screenWidth(),
-                        height: 67,
+                        height: headerHeight,
                         backgroundColor: '#fff',
                         top: 0,
                         opacity: 0.8
@@ -299,19 +293,20 @@ ws.Controller = (function(){
                 homeContainerView.add(
                     Ti.UI.createView({
                         width: ws.platform.screenWidth(),
-                        height: 67,
+                        height: headerHeight,
                         backgroundColor: 'transparent',
-                        layout: 'vertical',         
+                        layout: 'horizontal',         
                         top: 0
                     })
                 );
                 // Adding Header title
                 homeContainerView.children[1].add(
                     Ti.UI.createLabel({
-                        text: track.name,
-                        height: Ti.UI.SIZE,
+                        text: track.name, //.toUpperCase(),
+                        height: Ti.UI.FILL,
                         left: 10,
-                        top: 0,      
+                        bottom: 4,  
+                        verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_BOTTOM,
                         font: {
                             fontWeight: 'bold',
                             fontSize: ws.fonts.fontStyles.homeTrackTitle.fontSize,
@@ -320,15 +315,17 @@ ws.Controller = (function(){
                         color: ws.fonts.fontStyles.homeTrackTitle.fontColor
                     })
                 );
-                // Adding Header sub title (date and tv)
+                // Adding Header sub title (date and time)
                 homeContainerView.children[1].add(
                     Ti.UI.createLabel({
-                        text: track.textDate[ws.translations.getLanguage()] + (track.tv[ws.translations.getLanguage()]?" - " + track.tv[ws.translations.getLanguage()]:""),
-                        height: Ti.UI.SIZE,
+                        text: track.textDate[ws.translations.getLanguage()],// + (track.time?' - ' + track.time + 'h (CET)':''), 
+                        //(track.tv[ws.translations.getLanguage()]?" - " + track.tv[ws.translations.getLanguage()]:""),
+                        height: Ti.UI.FILL,
                         left: 10,
-                        top: 0,      
+                        bottom: 7,
+                        verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_BOTTOM,          
                         font: {
-                            fontSize: 16,
+                            fontSize: 17,
                             fontWeight: 'bold',
                             fontFamily: ws.fonts.fontStyles.detailTrackDate.fontFamily
                         },
@@ -340,7 +337,7 @@ ws.Controller = (function(){
                 var homeView = Ti.UI.createView({
                     width: ws.platform.screenWidth(),
                     height: Ti.UI.FILL,                                                
-                    top: 73,
+                    top: 48,
                     layout: 'vertical'
                 })
                 homeContainerView.add(homeView);
@@ -917,6 +914,10 @@ ws.Controller = (function(){
         // Rider detail action
         // ------------------------------------------------------------------------------------
         riderDetailAction: function(id) {    
+            if( !id )
+                id = this.lastRiderId;
+            else 
+                this.lastRiderId = id;
             var rider = this.model.getRider(id);
             // Rider detail view
             var riderDetailView = Ti.UI.createView({
@@ -1169,6 +1170,10 @@ ws.Controller = (function(){
         // Track detail action
         // ------------------------------------------------------------------------------------
         trackDetailAction: function(id) {    
+            if( !id )
+                id = this.lastTrackId;
+            else 
+                this.lastTrackId = id;
             var track = this.model.getTrack(id);
             // Track detail view
             var mainTrackDetailView = Ti.UI.createView({
@@ -1182,7 +1187,7 @@ ws.Controller = (function(){
                 backgroundImage: '/images/bg-jerez.png',
                 opacity: 0
             });
-            var titleViewHeight = 65;
+            var titleViewHeight = 44;
             mainTrackDetailView.add(
                 Ti.UI.createView({
                     top: 0,
@@ -1199,39 +1204,39 @@ ws.Controller = (function(){
                     top: 0,
                     left: 0,
                     width: ws.platform.screenWidth(),                                
-                    height: Ti.UI.SIZE,
+                    height: titleViewHeight,
                     backgroundColor: 'transparent',
-                    layout: 'vertical',                    
+                    layout: 'horizontal',                    
                     zIndex: 5
                 })
             );
             mainTrackDetailView.children[1].add(
                 Ti.UI.createLabel({
-                    text: track.name.toUpperCase(),
-                    height: Ti.UI.SIZE,
+                    text: track.name, //.toUpperCase(),
                     left: '2%',    
-                    top: 4,      
+                    height: Ti.UI.FILL,
+                    bottom: 4,  
+                    verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_BOTTOM,     
                     font: {
                         fontWeight: 'bold',
-                        fontSize: ws.fonts.fontStyles.detailTitle.fontSize,
-                        fontFamily: ws.fonts.fontStyles.detailTitle.fontFamily
+                        fontSize: ws.fonts.fontStyles.detailTrackTitle.fontSize,
+                        fontFamily: ws.fonts.fontStyles.detailTrackTitle.fontFamily
                     },
-                    opacity: 1,
                     color: ws.fonts.fontStyles.detailTitle.fontColor
                     // verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
                 })
             );
             mainTrackDetailView.children[1].add(
                 Ti.UI.createLabel({
-                    text: track.textDate[ws.translations.getLanguage()] + (track.tv[ws.translations.getLanguage()]?" - " + track.tv[ws.translations.getLanguage()]:""),
-                    height: Ti.UI.SIZE,
-                    left: '2%',    
-                    top: 1,      
+                    text: track.textDate[ws.translations.getLanguage()],// + (track.time?' - ' + track.time + 'h (CET)':''),
+                    height: Ti.UI.FILL,
+                    left: 10,    
+                    bottom: 7,  
+                    verticalAlign: Ti.UI.TEXT_VERTICAL_ALIGNMENT_BOTTOM,     
                     font: {
                         fontSize: ws.fonts.fontStyles.detailTrackDate.fontSize,
                         fontFamily: ws.fonts.fontStyles.detailTrackDate.fontFamily
                     },
-                    opacity: 1,
                     color: ws.fonts.fontStyles.detailTrackDate.fontColor
                 })
             );          
@@ -1279,17 +1284,21 @@ ws.Controller = (function(){
                     var leftImage = '5%';
                     var topImage  = 30;
                     break;
-                case 'top-right': // Argentina, Mugello, Assen, Sachsenring, Silverstone, Indianapolis
+                case 'top-right': // Argentina, Mugello, Assen, Sachsenring, Silverstone, Indianapolis, Sepang
                     var containerDetailsWidth = '55%';
                     var containerDetailsLeft = 8;
                     // Calculate height of resulting track image and divide by two to positioning view 
                     // in the center plus/minux x points top because of track image
-                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 70; 
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 70;
                     var leftImage = '21%';
-                    if( track.qname == 'mugello' || track.qname == 'silverstone' || track.qname == 'indianapolis' )
-                        var topImage  = 26;
-                    else
-                        var topImage  = 13;
+                    var topImage  = 13;
+                    if( track.qname == 'mugello' || track.qname == 'silverstone' || track.qname == 'indianapolis' ) {
+                        topImage  = 26;
+                    } else if( track.qname == "sepang" ) {
+                        topImage = 42
+                        containerDetailsTop += 18;
+                        leftImage = '28%';
+                    }
                     break;
                 case 'left': // Austin, Misano
                     var containerDetailsWidth = '55%';
@@ -1306,7 +1315,7 @@ ws.Controller = (function(){
                     }                    
                     
                     break;
-                case 'right': // Motorland, Jerez, Qatar???
+                case 'right': // Motorland, Jerez, Qatar, Phillip Island
                     var containerDetailsWidth = '55%';
                     var containerDetailsLeft = 8;
                     // Calculate height of resulting track image and divide by two to positioning view 
@@ -1317,11 +1326,15 @@ ws.Controller = (function(){
                     if( track.qname == 'jerez' ) {
                         containerDetailsTop -= 40;
                         leftImage = '36%';
-                        topImage = 45  
+                        topImage = 45; 
                     } else if( track.qname == 'qatar') {
                         containerDetailsTop -= 115;
                         leftImage = '28%';
-                        topImage = 65  
+                        topImage = 65; 
+                    } else if( track.qname == 'phillip_island') {
+                        containerDetailsTop -= 10;
+                        leftImage = '24%';
+                        topImage = 35;  
                     }
                     break;
                 case 'bottom-left': // Motegui
@@ -1329,7 +1342,7 @@ ws.Controller = (function(){
                     var containerDetailsLeft = '48%';
                     // Calculate height of resulting track image and divide by two to positioning view 
                     // in the center plus/minux x points top because of track image
-                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 15; 
+                    var containerDetailsTop = (ws.platform.screenWidth()*imageFactor/2 ) + 15;
                     var leftImage = '-5%';
                     var topImage  = 55;
                     break;
@@ -1353,6 +1366,10 @@ ws.Controller = (function(){
                     var topImage  = 50;
                     break;
             }       
+            
+            topImage -= 18;
+            containerDetailsTop -= 18;
+            
             // Adding track image     
             mainTrackDetailView.children[2].children[0].add(
                 Ti.UI.createImageView({
