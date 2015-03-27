@@ -119,6 +119,7 @@ ws.Controller = (function(){
                 var child = ws.mainAppView.children[ws.mainAppView.getChildren().length-1];
                 Ti.API.info("Remove view " + child + " from main App View");
                 ws.mainAppView.remove(child);
+                child.removeAllChildren();
                 child = null;
             }
         },
@@ -406,13 +407,28 @@ ws.Controller = (function(){
                 countdown.start();
                 
                 // Track image
+                var w = ws.platform.screenWidth() * 0.7;
                 homeView.add(
-                    Ti.UI.createImageView({
-                        image: track.image,
+                    Ti.UI.createView({
                         top: -20,
                         left: '15%',
-                        width: '70%'
+                        width: w,
+                        height: w                                    
                     })
+                );
+                
+                
+                // Ti.UI.createImageView({
+                    // image: track.image,
+                    // top: -20,
+                    // left: '15%',
+                    // width: '70%'
+                // })
+                
+                var eResource = new ws.utils.ExternalResource();
+                eResource.getImage(
+                    track.image,
+                    homeView.children[homeView.children.length-1]
                 );
                 
                 // Add detail view container
@@ -934,12 +950,17 @@ ws.Controller = (function(){
             var headerHeight = (ws.platform.screenWidth() / 5) * 2;
             // Rider photo
             riderDetailView.add(
-                Ti.UI.createImageView({
-                    image: rider.photo,
+                Ti.UI.createView({
                     top: 0,
                     left: 0,
-                    width: headerHeight 
+                    width: headerHeight,
+                    height: headerHeight
                 })
+            );
+            var eResource = new ws.utils.ExternalResource();
+            eResource.getImage(
+                rider.photo,
+                riderDetailView.children[0]
             );
             // Rider details right                 
             riderDetailView.add(
@@ -1370,14 +1391,20 @@ ws.Controller = (function(){
             topImage -= 18;
             containerDetailsTop -= 18;
             
-            // Adding track image     
+            // Adding track image container
+            var w = ws.platform.screenWidth() * imageFactor;                 
             mainTrackDetailView.children[2].children[0].add(
-                Ti.UI.createImageView({
-                    image: track.image,
+                Ti.UI.createView({
                     top: topImage,
                     left: leftImage,
-                    width: '70%'
+                    width: w,
+                    height: w
                 })
+            ); 
+            var eResource = new ws.utils.ExternalResource();
+            eResource.getImage(
+                track.image,
+                mainTrackDetailView.children[2].children[0].children[0]
             );
             // Adding container track details
             mainTrackDetailView.children[2].children[0].add(
